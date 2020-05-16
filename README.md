@@ -1,10 +1,18 @@
 # SB Theme Search
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.9.
+Portal to work on tagging
 
-## Development server
+## Installation Steps
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1) Install node v8.16.0 and npm v6.4.1
+2) Do `npm install –g @angular/cli@6.0.8` and verify installation `ng -v`
+3) Do `npm install rxjs@6.3.3 --save` to resolve compatibility issues.
+
+## Development Steps
+
+1) Do `npm i` in project folder.
+2) Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+3) Username and Password is abc
 
 ## Code scaffolding
 

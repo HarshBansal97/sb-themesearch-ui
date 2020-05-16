@@ -9,6 +9,12 @@ import { AddTagComponent } from '../add-tag/add-tag.component';
 })
 export class MenuComponent implements OnInit {
  
+  selectedText: string = '';
+
+  staticText:string = "The topics discussed by Dhṛtarāṣṭra\n"+
+  "and Sañjaya, as described in the Mahābhārata,\n"+
+  "form the basic principle for this great philosophy."
+
   constructor(
     public dialog: MatDialog
   ) { }
@@ -17,6 +23,14 @@ export class MenuComponent implements OnInit {
     
   }
   addTag(): void {
+
+    if (window.getSelection) {
+      //console.log(window.getSelection())
+      this.selectedText = window.getSelection().toString();
+      console.log("Selected Substring starts at index:", this.staticText.search(this.selectedText)," and ends at index:", this.staticText.search(this.selectedText)+this.selectedText.length-1)
+
+    }
+
     const dialogRef = this.dialog.open(AddTagComponent, {
       
     });

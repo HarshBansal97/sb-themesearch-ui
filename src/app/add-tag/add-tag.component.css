@@ -1,0 +1,13 @@
+.text-allign-header-cell{
+    text-align: center;
+    min-width: 10vw !important;
+  }
+  
+  .text-allign-cell{
+    text-align: left;
+  }
+
+table {
+    width: auto;
+    min-width: 100%;
+}

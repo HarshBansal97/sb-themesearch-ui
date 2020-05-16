@@ -1,3 +1,19 @@
-<button class="common-btn btn mt-2 float-left" (click)="addTag()">
-  Add Tag
-</button>
+<div class="row">
+  <div class="col-lg-3">
+    <mat-form-field class="example-full-width col-sm-12">
+      <mat-label>Static Text</mat-label>
+      <textarea matInput>{{staticText}}</textarea>
+    </mat-form-field>
+  </div>
+  <div class="col-lg-3">
+    <button class="common-btn btn mt-2 float-left" (click)="addTag()">
+      Add Tag
+    </button>
+  </div>
+  <div class="col-lg-3">
+    <mat-form-field class="col-sm-12">
+      <mat-label>Selected Text</mat-label>
+      <textarea matInput>{{selectedText}}</textarea>
+    </mat-form-field>
+  </div>
+</div>
