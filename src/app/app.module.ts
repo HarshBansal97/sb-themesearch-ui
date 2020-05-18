@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
-import { EmployeeDataService } from './employee-data.service';
 import { ErrorComponent } from './error/error.component';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
@@ -13,6 +12,7 @@ import { TokenInterceptorService } from './token-interceptor.service';
 import { AddTagComponent } from './add-tag/add-tag.component';
 import {NgModule} from '@angular/core';
 import { DemoMaterialModule } from '../material-module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -29,7 +29,8 @@ import { DemoMaterialModule } from '../material-module';
     FormsModule,
     HttpClientModule,
     DemoMaterialModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ReactiveFormsModule,
   ],
   entryComponents: [
     AddTagComponent

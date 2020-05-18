@@ -4,7 +4,7 @@
       <a class="navbar-brand" href="#">SB Theme Search</a>
     </div>
     <ul class="nav navbar-nav" *ngIf='authServiceService.isUserLogin()'>
-      <li class="active"><a class="btn" (click)="onMenuClick()">Menu</a></li>
+      <li class="active"><a class="btn" (click)="onMenuClick()">Home</a></li>
     </ul>
     <ul class="nav navbar-nav"  *ngIf='authServiceService.isUserLogin()'>
         <li class="active"><a routerLink='/logout'>Logout</a></li>

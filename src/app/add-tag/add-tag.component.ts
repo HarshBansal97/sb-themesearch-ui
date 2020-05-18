@@ -3,24 +3,17 @@ import {MatDialogRef} from '@angular/material/dialog';
 import {SelectionModel} from '@angular/cdk/collections';
 import {MatTableDataSource} from '@angular/material/table';
 
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
+export interface Tag {
+  tag: string;
+  subCategory: string;
+  category: string;
 }
 
-const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
+const TAG_DATA: Tag[] = [
+  {tag: 'Omnipotence', subCategory: 'Ishvara Tattva - Greatness', category: 'Philosophical'},
+  {tag: 'Above Maya', subCategory: 'Ishvara Tattva - Greatness', category: 'Philosophical'},
+  {tag: 'Reservoir of all rasas', subCategory: 'Ishvara Tattva - Sweetness', category: 'Philosophical'},
+  {tag: 'Shukadev Govami', subCategory: 'Important Personalities', category: 'Historical'},
 ];
 @Component({
   selector: 'app-add-tag',
@@ -33,9 +26,9 @@ export class AddTagComponent{
     public dialogRef: MatDialogRef<AddTagComponent>
   ) {}
   
-  displayedColumns: string[] = ['select', 'position', 'name', 'weight', 'symbol'];
-  dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
-  selection = new SelectionModel<PeriodicElement>(true, []);
+  displayedColumns: string[] = ['select', 'tag', 'subCategory', 'category'];
+  dataSource = new MatTableDataSource<Tag>(TAG_DATA);
+  selection = new SelectionModel<Tag>(true, []);
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -57,20 +50,22 @@ export class AddTagComponent{
   // }
 
   /** The label for the checkbox on the passed row */
-  checkboxLabel(row?: PeriodicElement): string {
-    if (!row) {
-      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
-    }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
-  }
+  // checkboxLabel(row?: Tag): string {
+  //   if (!row) {
+  //     return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+  //   }
+  //   return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
+  // }
 
   add(): void {
+    var rows = []
     this.dataSource.data.forEach(row => {
       if (this.selection.isSelected(row)) {
         console.log("SELECTED ROW: ",row);
+        rows.push(row);
       }
     });
-    this.dialogRef.close('RESULT FROM ADD TAG!');
+    this.dialogRef.close(rows);
   }
 
 }

@@ -1,19 +1,96 @@
-<div class="row">
-  <div class="col-lg-3">
-    <mat-form-field class="example-full-width col-sm-12">
-      <mat-label>Static Text</mat-label>
-      <textarea matInput>{{staticText}}</textarea>
-    </mat-form-field>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+      <div class="form-group">
+        <form [formGroup]="verseSelectionForm">
+          <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-2">
+              <mat-form-field class="col-sm-12">
+                <select matNativeControl formControlName="canto" placeholder="Canto">
+                  <option *ngFor="let ca of cantos; let i=index" [value]="i+1">{{i+1}}</option>
+                </select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-2">
+              <mat-form-field class="col-sm-12">
+                <select matNativeControl formControlName="chapter" placeholder="Chapter">
+                  <option *ngFor="let ch of chapters; let i=index" [value]="i+1">{{i+1}}</option>
+                </select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-2">
+              <mat-form-field class="col-sm-12">
+                <select matNativeControl formControlName="verse" placeholder="Verse Number">
+                  <option *ngFor="let v of verses; let i=index" [value]="i+1">{{i+1}}</option>
+                </select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 col-md-2">
+              <button type="submit" color="primary" class="btn-info btn mt-2 float-left" (click)="onSubmitVerse()">
+                Search
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-  <div class="col-lg-3">
-    <button class="common-btn btn mt-2 float-left" (click)="addTag()">
-      Add Tag
-    </button>
+
+  <div class="form-group">
+    <form [formGroup]="verseForm">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4" style="text-align: center;">
+            <mat-label>VERSE</mat-label>
+            <textarea matInput rows="10" formControlName="verseText"></textarea>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+            <mat-label>TRANSLATION</mat-label>
+            <textarea matInput rows="10" formControlName="translationText"></textarea>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+            <mat-label>PURPORT</mat-label>
+            <textarea matInput rows="10" formControlName="purportText"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6 col-xs-12 col-md-6">
+          <button type="submit" class="btn-primary btn mt-2 float-right">
+            Submit
+          </button>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-6">
+          <button class="btn-secondary btn mt-2 float-left">
+            Clear
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
-  <div class="col-lg-3">
-    <mat-form-field class="col-sm-12">
-      <mat-label>Selected Text</mat-label>
-      <textarea matInput>{{selectedText}}</textarea>
-    </mat-form-field>
+
+  <div class="row">
+    <div class="col-lg-4">
+      <mat-form-field appearance="outline" class="col-sm-12">
+        <mat-label>Selected Text</mat-label>
+        <textarea matInput rows="5" readonly>{{selectedText}}</textarea>
+      </mat-form-field>
+    </div>
+    <!-- <div class="col-lg-3">
+      <mat-form-field class="example-full-width col-sm-12">
+        <mat-label>Static Text</mat-label>
+        <textarea matInput>{{staticText}}</textarea>
+      </mat-form-field>
+    </div> -->
+    <div class="col-lg-3">
+      <button class="common-btn btn mt-2 float-left" (click)="addTag()">
+        Add Tag
+      </button>
+    </div>
+    
   </div>
 </div>
