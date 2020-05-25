@@ -1,0 +1,46 @@
+.login-image {
+    background: #FFF url('../../assets/image.jpg') center center no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+}
+
+/*.center-horz {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  } */
+
+.center-both {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+
+.login-card {
+    min-width: 25vw;
+}
+
+
+.login-card-content > *{
+    width: 100%;
+    font-size: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.jio-long-button{
+    background: #2A3890;
+    text-align: center;
+    color: #fff;
+    padding: 10px;
+    border-width: 0px;
+}
+
+
+

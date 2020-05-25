@@ -1,0 +1,61 @@
+.progress-loader {
+    position: fixed; /* Sit on top of the page content */
+    display: block; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 1); /* Black background with opacity */
+    opacity: 0.5;
+    z-index: 1; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: progress; /* Add a pointer on hover */
+  }
+  
+  .loader {
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+  /* color: white; */
+  /* transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%); */
+  }
+  /* .hidden {
+  visibility: hidden;
+  }
+  .loader-overlay {
+  position: absolute;
+  width: 100%;
+  z-index: 500000;
+  top: 0;
+  }
+  .loader {
+  height: 4px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #FFF;
+  }
+  .loader:before {
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 4px;
+  background-color: red;
+  animation: loading 2s linear infinite;
+  }
+  @keyframes loading {
+  from {left: -200px; width: 30%;}
+  50% {width: 30%;}
+  70% {width: 70%;}
+  80% {left: 50%;}
+  95% {left: 120%;}
+  to {left: 100%;}
+  } */

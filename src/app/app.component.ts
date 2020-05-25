@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
   title = 'Employee';
-  constructor(private authServiceService: AuthServiceService, private router : Router){}
+  constructor(public authServiceService: AuthServiceService, private router : Router){}
 
   onMenuClick(){
     this.router.navigate(['menu',this.authServiceService.nameUser()]);

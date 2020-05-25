@@ -6,25 +6,22 @@
           <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-2">
               <mat-form-field class="col-sm-12">
-                <select matNativeControl formControlName="canto" placeholder="Canto">
+                <input matInput placeholder="Canto" name="canto" formControlName="canto">
+                <!-- <select matNativeControl formControlName="canto" placeholder="Canto">
                   <option *ngFor="let ca of cantos; let i=index" [value]="i+1">{{i+1}}</option>
-                </select>
+                </select> -->
               </mat-form-field>
             </div>
 
             <div class="col-xs-12 col-sm-6 col-md-2">
               <mat-form-field class="col-sm-12">
-                <select matNativeControl formControlName="chapter" placeholder="Chapter">
-                  <option *ngFor="let ch of chapters; let i=index" [value]="i+1">{{i+1}}</option>
-                </select>
+                <input matInput placeholder="Chapter" name="chapter" formControlName="chapter">
               </mat-form-field>
             </div>
 
             <div class="col-xs-12 col-sm-6 col-md-2">
               <mat-form-field class="col-sm-12">
-                <select matNativeControl formControlName="verse" placeholder="Verse Number">
-                  <option *ngFor="let v of verses; let i=index" [value]="i+1">{{i+1}}</option>
-                </select>
+                <input matInput placeholder="Verse Number(s)" name="verse" formControlName="verse">
               </mat-form-field>
             </div>
 
@@ -34,63 +31,133 @@
               </button>
             </div>
 
+            <div class="col-xs-12 col-sm-6 col-md-2">
+              <p style="color: red">{{errortext}}</p>
+            </div>
           </div>
         </form>
       </div>
     </div>
   </div>
-
-  <div class="form-group">
-    <form [formGroup]="verseForm">
+  <div *ngIf="fetchedVerse">
+    <div class="form-group">
+      <form [formGroup]="verseForm" class="border">
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4"
+              style="text-align: center;">
+              <mat-label>VERSE</mat-label>
+              <textarea matInput rows="10" formControlName="verseText" readonly></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+              <mat-label>TRANSLATION</mat-label>
+              <textarea matInput rows="10" formControlName="translationText" readonly></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+              <mat-label>PURPORT</mat-label>
+              <textarea matInput rows="10" formControlName="purportText"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-          <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4" style="text-align: center;">
-            <mat-label>VERSE</mat-label>
-            <textarea matInput rows="10" formControlName="verseText"></textarea>
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-            <mat-label>TRANSLATION</mat-label>
-            <textarea matInput rows="10" formControlName="translationText"></textarea>
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-            <mat-label>PURPORT</mat-label>
-            <textarea matInput rows="10" formControlName="purportText"></textarea>
-          </mat-form-field>
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+            <mat-form-field class="col-sm-12">
+              <mat-label>Tags</mat-label>
+              <mat-select [formControl]='translationTagsSelect' multiple>
+                <mat-option *ngFor="let tag of translationTags" [value]="tag.tag" [disabled]="tag.disabled">{{tag.tag}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
+            <button type="submit" class="btn-primary btn mt-2 full-width" (click)="addTag('translation',-1)">
+              Add
+            </button>
+          </div>
+          <!-- <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
+            <button type="submit" class="btn-warning btn mt-2 full-width" (click)="removeTag('translation',-1)">
+              Remove
+            </button>
+          </div> -->
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+            <button type="submit" class="btn-primary btn mt-2 float-right" (click)="addSection()">
+              Add Section
+            </button>
+          </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-6 col-xs-12 col-md-6">
-          <button type="submit" class="btn-primary btn mt-2 float-right">
-            Submit
-          </button>
+        <div *ngFor="let ps of purportSections; let i=index;">
+          <div class="col-md-4">
+            <div class="purportSectionCard">
+              <div class="row">
+                <mat-form-field appearance="outline" class="col-xs-12">
+                  <mat-label>Purport Section</mat-label>
+                  <textarea matInput rows="5" readonly>{{getPurportSectionText(i)}}</textarea>
+                </mat-form-field>
+              </div>
+              <div class="row">
+                <div class="col-xs-9">
+                  <mat-form-field class="col-sm-12">
+                    <mat-label>Tags</mat-label>
+                    <mat-select [(value)]='purportSectionTagsSelect[i]' multiple>
+                      <mat-option *ngFor="let tag of ps.tags" [value]="tag.tag" [disabled]="tag.disabled">
+                        {{tag.tag}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-xs-3">
+                  <button class="btn-primary btn mt-2 full-width" (click)="addTag('purportSection', i)">
+                    Add
+                  </button>
+                </div>
+                <!-- <div class="col-xs-3">
+                  <button class="btn-warning btn mt-2 full-width" (click)="removeTag('purportSection', i)">
+                    Remove
+                  </button>
+                </div> -->
+              </div>
+              <!-- <div class="row">
+                <div class="col-xs-6">
+                  <button class="btn-danger btn mt-2 float-left" (click)="removeSection(i)">
+                    Remove Section
+                  </button>
+                </div>
+              </div> -->
+            </div>
+          </div>
         </div>
-        <div class="col-xs-12 col-sm-6 col-md-6">
-          <button class="btn-secondary btn mt-2 float-left">
-            Clear
+        <!-- <div class="col-lg-3">
+          <mat-form-field class="example-full-width col-sm-12">
+            <mat-label>Static Text</mat-label>
+            <textarea matInput>{{staticText}}</textarea>
+          </mat-form-field>
+        </div> -->
+        <!-- <div class="col-lg-3">
+          <button class="common-btn btn mt-2 float-left" (click)="addTag()">
+            Add Tag
           </button>
-        </div>
-      </div>
-    </form>
-  </div>
+        </div> -->
 
-  <div class="row">
-    <div class="col-lg-4">
-      <mat-form-field appearance="outline" class="col-sm-12">
-        <mat-label>Selected Text</mat-label>
-        <textarea matInput rows="5" readonly>{{selectedText}}</textarea>
-      </mat-form-field>
+      </div>
+
     </div>
-    <!-- <div class="col-lg-3">
-      <mat-form-field class="example-full-width col-sm-12">
-        <mat-label>Static Text</mat-label>
-        <textarea matInput>{{staticText}}</textarea>
-      </mat-form-field>
-    </div> -->
-    <div class="col-lg-3">
-      <button class="common-btn btn mt-2 float-left" (click)="addTag()">
-        Add Tag
-      </button>
+    <br>
+    <br>
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-4">
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4">
+        <button class="btn-primary btn mt-2 full-width" (click)="onSubmitChanges()">
+          Submit Changes
+        </button>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4">
+      </div>
     </div>
-    
   </div>
 </div>

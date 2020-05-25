@@ -13,6 +13,9 @@ import { AddTagComponent } from './add-tag/add-tag.component';
 import {NgModule} from '@angular/core';
 import { DemoMaterialModule } from '../material-module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LoaderComponent } from './loader/loader.component';
+import { LoaderService } from './loader.service';
+import { LoaderInterceptor } from './loader-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -21,7 +24,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     ErrorComponent,
     LoginComponent,
     LogoutComponent,
-    AddTagComponent
+    AddTagComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -36,10 +40,16 @@ import { ReactiveFormsModule } from '@angular/forms';
     AddTagComponent
   ],
 
-  providers: [ 
+  providers: [
+    LoaderService,
   {
     provide: HTTP_INTERCEPTORS,
     useClass: TokenInterceptorService,
+    multi: true
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: LoaderInterceptor,
     multi: true
   }
   ],
