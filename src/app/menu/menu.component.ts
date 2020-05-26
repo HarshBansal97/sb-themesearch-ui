@@ -38,7 +38,7 @@ export class MenuComponent implements OnInit {
     this.verseSelectionForm = this.fb.group({
       canto: ['1'],
       chapter: ['1'],
-      verse: ['-1']
+      verse: ['1']
     });
 
     this.verseForm = this.fb.group({
@@ -58,6 +58,7 @@ export class MenuComponent implements OnInit {
     this.purportSections = [];
     this.purportSectionTagsSelect = [];
     this.translationTagsSelect.setValue('');
+    this.errortext = '';
     this.verseForm.reset();
     console.log(this.verseSelectionForm.value);
     this.db.getVerse(this.verseSelectionForm.value).subscribe(r => {
