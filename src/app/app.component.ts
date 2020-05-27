@@ -12,6 +12,6 @@ export class AppComponent {
   constructor(public authServiceService: AuthServiceService, private router : Router){}
 
   onMenuClick(){
-    this.router.navigate(['menu',this.authServiceService.nameUser()]);
+    this.router.navigate(['home']);
   }
 }

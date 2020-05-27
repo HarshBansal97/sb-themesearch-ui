@@ -16,8 +16,10 @@ export class DbService {
 
     let params = new HttpParams();
     params = params.set('verse_id', verse_id);
+    
     const headers = new HttpHeaders();
     headers.set("content-type", "application/json; charset=utf-8");
+    
     return this.http.get(APIConstants.VERSE, { headers: headers, params: params });
   }
 

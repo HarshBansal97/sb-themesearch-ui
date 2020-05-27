@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
     if (this.validate) {
       sessionStorage.setItem('authUsername', this.username);
       sessionStorage.setItem('jwt','jwtjwtjwt');
-      this.route.navigate(['menu',this.username]);
+      this.route.navigate(['home']);
     }
   }
 
