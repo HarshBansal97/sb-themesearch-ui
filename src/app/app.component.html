@@ -1,13 +1,13 @@
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">SB Theme Search</a>
+    <div class="navbar-header" style="background-color: rgba(48, 42, 150, 0.3)">
+      <a class="navbar-brand" href="#" style="color: rgb(240, 240, 240); font-family: ;">SB Theme Search</a>
     </div>
     <ul class="nav navbar-nav" *ngIf='authServiceService.isUserLogin()'>
-      <li class="active"><a class="btn" (click)="onMenuClick()">Home</a></li>
+      <li class="active"><a (click)="onMenuClick()" style="background-color: rgba(48, 42, 150, 0.3); text-align-last: center;">Home</a></li>
     </ul>
     <ul class="nav navbar-nav"  *ngIf='authServiceService.isUserLogin()'>
-        <li class="active"><a routerLink='/logout'>Logout</a></li>
+        <li class="active"><a routerLink='/logout' style="background-color: rgba(48, 42, 150, 0.3); text-align-last: center;">Logout</a></li>
       </ul>
      
   </div>

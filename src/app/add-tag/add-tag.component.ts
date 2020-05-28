@@ -24,8 +24,8 @@ export class AddTagComponent {
     private db: DbService,
   ) { }
   
-  TAG_DATA: Tag[] = this.getTagsFromDB();
-  
+  // TAG_DATA: Tag[] = this.getTagsFromDB();
+  TAG_DATA: Tag[] = [{'tag':'tagText', 'subCategory':'subCategoryText', 'category':'categoryText'}]
   getTagsFromDB() {
     console.log('CALLING EXPORT TAGS');
     var tagsData = this.db.exportTags();
