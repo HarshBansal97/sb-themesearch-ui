@@ -17,6 +17,11 @@ import { LoaderComponent } from './loader/loader.component';
 import { LoaderService } from './loader.service';
 import { LoaderInterceptor } from './loader-interceptor.service';
 
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,6 +40,10 @@ import { LoaderInterceptor } from './loader-interceptor.service';
     DemoMaterialModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    MatExpansionModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   entryComponents: [
     AddTagComponent

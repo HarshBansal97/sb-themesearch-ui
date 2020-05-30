@@ -70,7 +70,11 @@ export class MenuComponent implements OnInit {
           this.verseForm.controls['verseText'].setValue(verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms']);
           this.verseForm.controls['translationText'].setValue(verseInfo['translation']);
           this.verseForm.controls['purportText'].setValue(verseInfo['purport']);
-          this.fetchedVerse = true;
+          document.getElementById("vData").innerText = verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms'];
+          document.getElementById("tData").innerText = verseInfo['translation'];
+          document.getElementById("pData").innerText = verseInfo['purport'];
+                    this.fetchedVerse = true;
+          
           // GET TAGS
           this.getTranslationTags();
         } else {

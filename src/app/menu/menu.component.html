@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <div class="row" style="background-color:rgb(245, 244, 244);">
+  <div class="row" style="background-color:rgb(245, 244, 244); padding-top: 20px;">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="form-group">
         <form [formGroup]="verseSelectionForm">
@@ -26,7 +26,7 @@
             </div>
 
             <div class="col-xs-12 col-sm-6 col-md-3">
-              <button type="submit" color="primary" class="btn-info btn float-center btn-lg btn-block" (click)="onSubmitVerse()">
+              <button mat-raised-button type="submit" color="primary" class="" (click)="onSubmitVerse()">
                 Search
               </button>
             </div>
@@ -39,8 +39,51 @@
       </div>
     </div>
   </div>
+
+
+  <!--From here the text area begins-->
+  <div style="margin: 30px 0px;">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+        <mat-panel-title>
+          Verse
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p style="text-align: center; font-size: medium; padding: 0px 40px;"><span id="vData"></span></p>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+        <mat-panel-title>
+          Translation
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+    
+      <p style="text-align: justify; font-size: medium; font-weight: bold; padding: 0px 40px;"><span id="tData"></span></p>
+    
+      <mat-action-row>
+        <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+      </mat-action-row>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+        <mat-panel-title>
+          Purport
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+    
+      <p style="text-align: justify; font-size: medium; padding: 0px 40px;"><span id="pData"></span></p>
+    
+      <mat-action-row>
+        <button mat-button>Create section</button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </div>
+
   <div *ngIf="fetchedVerse">
     <div class="form-group">
+      <!--
       <form [formGroup]="verseForm" class="border">
         <div class="row">
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -78,11 +121,11 @@
               Add
             </button>
           </div>
-          <!-- <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
+           <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
             <button type="submit" class="btn-warning btn mt-2 full-width" (click)="removeTag('translation',-1)">
               Remove
             </button>
-          </div> -->
+          </div> 
           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
             <button type="submit" class="btn-primary btn mt-2 float-right" (click)="addSection()">
               Add Section
@@ -90,6 +133,7 @@
           </div>
         </div>
       </div>
+    -->
       <div class="row">
         <div *ngFor="let ps of purportSections; let i=index;">
           <div class="col-md-4">
