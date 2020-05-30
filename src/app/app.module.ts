@@ -16,6 +16,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LoaderComponent } from './loader/loader.component';
 import { LoaderService } from './loader.service';
 import { LoaderInterceptor } from './loader-interceptor.service';
+import { Globals } from './globals'
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { LoaderInterceptor } from './loader-interceptor.service';
 
   providers: [
     LoaderService,
+    Globals,
   {
     provide: HTTP_INTERCEPTORS,
     useClass: TokenInterceptorService,

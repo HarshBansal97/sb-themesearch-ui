@@ -3,6 +3,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { AddTagComponent } from '../add-tag/add-tag.component';
 import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@angular/forms';
 import { DbService } from '../db.service';
+import { Globals } from '../globals';
+
 
 @Component({
   selector: 'app-menu',
@@ -32,6 +34,7 @@ export class MenuComponent implements OnInit {
     public dialog: MatDialog,
     private fb: FormBuilder,
     private db: DbService,
+    public gb: Globals,
   ) { }
 
   ngOnInit() {
@@ -47,11 +50,16 @@ export class MenuComponent implements OnInit {
       purportText: ['']
     });
 
+    this.getTagsForTable();
     this.onSubmitVerse();
   }
 
   get vf() { return this.verseForm.controls; }
 
+  getTagsForTable() {
+    let tagsData = this.gb.getTagsFromDB();
+    this.gb.parseTags(tagsData);
+  }
   onSubmitVerse() {
     this.fetchedVerse = false;
     this.translationTags = [];
@@ -151,14 +159,16 @@ export class MenuComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed with result,', result);
-      if (identifier === 'translation') {
-        this.translationTags = this.translationTags.concat(result);
-      } else if (identifier === 'purportSection') {
-        if (parseInt(index) !== -1) {
-          this.purportSections[parseInt(index)]['tags'] = this.purportSections[parseInt(index)]['tags'].concat(result);
-          console.log('ADD TAG: PURPORT ', this.purportSections);
-        } else {
-          console.log('ADD TAG: WRONG INDEX PASSED FOR PURPORT SECTION');
+      if (result) {
+        if (identifier === 'translation') {
+          this.translationTags = this.translationTags.concat(result);
+        } else if (identifier === 'purportSection') {
+          if (parseInt(index) !== -1) {
+            this.purportSections[parseInt(index)]['tags'] = this.purportSections[parseInt(index)]['tags'].concat(result);
+            console.log('ADD TAG: PURPORT ', this.purportSections);
+          } else {
+            console.log('ADD TAG: WRONG INDEX PASSED FOR PURPORT SECTION');
+          }
         }
       }
 

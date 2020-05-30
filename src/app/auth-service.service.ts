@@ -1,30 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { APIConstants } from './restapis';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthServiceService {
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private http: HttpClient) {
 
   }
 
   authUser(username: string, password: string): any {
-    //  var request={
-    //     "username":username,
-    //     "password":password
-    //   };
-
-    //   console.log("In auth service")
-    //   return this.httpClient.post("http://localhost:8081/authuser",request);
-
-    if (username === 'abc' && password === 'abc') {
-      return true;
-    } else {
-      return false;
-    }
+    var request = {
+      "username": username,
+      "password": password
+    };
+    console.log("In auth service")
+    // const headers = new HttpHeaders();
+    // headers.set("content-type", "application/json; charset=utf-8");
+    // return this.http.post(APIConstants.LOGIN, request, { headers: headers });
+    return this.http.post(APIConstants.LOGIN, request);
   }
 
   isUserLogin(userName?: string): boolean {
@@ -52,6 +48,8 @@ export class AuthServiceService {
   }
   logoutUser() {
     sessionStorage.removeItem('authUsername');
-    sessionStorage.removeItem('jwt');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('account_type');
+    sessionStorage.removeItem('user_id');
   }
 }

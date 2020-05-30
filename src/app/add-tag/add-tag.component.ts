@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
 import { DbService } from '../db.service';
+import { Globals } from '../globals';
 
 export interface Tag {
   tag: string;
@@ -18,35 +19,36 @@ export interface Tag {
 })
 export class AddTagComponent {
 
-  
+
   constructor(
     public dialogRef: MatDialogRef<AddTagComponent>,
     private db: DbService,
+    public gb: Globals,
   ) { }
-  
-  TAG_DATA: Tag[] = this.getTagsFromDB();
-  
-  getTagsFromDB() {
-    console.log('CALLING EXPORT TAGS');
-    var tagsData = this.db.exportTags();
-    var returnTags: Tag[] = [];
-    var categories = tagsData['outline'];
-    for (var cat of categories) {
-      var categoryText = cat['text'];
-      var subCategories = cat['outline'];
-      for (var subCat of subCategories) {
-        var subCategoryText = subCat['text'];
-        var tags = subCat['outline'];
-        for (var tag of tags) {
-          var tagText = tag['text'];
-          returnTags.push({'tag':tagText, 'subCategory':subCategoryText, 'category':categoryText})
-        }
-      }
-    }
-    return returnTags;
-  }
+
+  // TAG_DATA: Tag[] = this.getTagsFromDB();
+
+  // getTagsFromDB() {
+  //   console.log('CALLING EXPORT TAGS');
+  //   var tagsData = this.gb.rawTags;
+  //   var returnTags: Tag[] = [];
+  //   var categories = tagsData['outline'];
+  //   for (var cat of categories) {
+  //     var categoryText = cat['text'];
+  //     var subCategories = cat['outline'];
+  //     for (var subCat of subCategories) {
+  //       var subCategoryText = subCat['text'];
+  //       var tags = subCat['outline'];
+  //       for (var tag of tags) {
+  //         var tagText = tag['text'];
+  //         returnTags.push({ 'tag': tagText, 'subCategory': subCategoryText, 'category': categoryText })
+  //       }
+  //     }
+  //   }
+  //   return returnTags;
+  // }
   displayedColumns: string[] = ['select', 'tag', 'subCategory', 'category'];
-  dataSource = new MatTableDataSource<Tag>(this.TAG_DATA);
+  dataSource = new MatTableDataSource<Tag>(this.gb.tagsForTable);
   selection = new SelectionModel<Tag>(true, []);
 
   applyFilter(event: Event) {
@@ -87,7 +89,17 @@ export class AddTagComponent {
     for (var _i = 0; _i < rows.length; _i++) {
       rows[_i]['disabled'] = false;
     }
-    this.dialogRef.close(rows);
+    if (rows.length === 0) {
+      window.alert("Please select a tag")
+    } else {
+      this.dialogRef.close(rows);
+    }
+
+    
+  }
+
+  close(): void {
+    this.dialogRef.close();
   }
 
 }
