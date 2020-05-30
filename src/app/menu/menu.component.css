@@ -1,3 +1,8 @@
+/*.container-fluid {
+    background-image: url('../../assets/texture2.jpg');
+    min-height: 100vh;
+}
+*/
 .center-child {
   display: flex;
   justify-content: center;
