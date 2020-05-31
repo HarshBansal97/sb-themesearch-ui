@@ -39,6 +39,21 @@
       </div>
     </div>
   </div>
+  <!-- <div (textSelect)="renderRectangles( $event )" class="container">
+    {{vf.purportText.value}}
+    O my Lord, Śrī Kṛṣṇa, son of Vasudeva, O all-pervading Personality of Godhead, I offer my respectful obeisances unto You. I meditate upon Lord Śrī Kṛṣṇa because He is the Absolute Truth and the primeval cause of all causes of the creation, sustenance and destruction of the manifested universes. He is directly and indirectly conscious of all
+    <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left"
+  [style.top.px]="hostRectangle.top" [style.width.px]="hostRectangle.width" [style.height.px]="0">
+
+      <div class="indicator__cta">
+        <a (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation(); addPurportSection()"
+          class="indicator__cta-link">
+          Add Purport Section
+        </a>
+      </div>
+
+    </div>
+  </div> -->
   <div *ngIf="fetchedVerse">
     <div class="form-group">
       <form [formGroup]="verseForm" class="border">
@@ -55,7 +70,7 @@
             </mat-form-field>
             <mat-form-field appearance="outline" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
               <mat-label>PURPORT</mat-label>
-              <textarea matInput rows="10" formControlName="purportText" readonly></textarea>
+              <textarea matInput rows="10" formControlName="translationText" readonly></textarea>
             </mat-form-field>
           </div>
         </div>

@@ -1,5 +1,15 @@
 import { Injectable } from '@angular/core';
 
+export interface Tag {
+  tag: string;
+  subCategory: string;
+  category: string;
+//   tagId: number;
+//   tagger: string;
+//   reviewer: string;
+  disabled: boolean;
+}
+
 @Injectable()
 export class Globals {
     tagsForTable;

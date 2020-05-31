@@ -17,6 +17,7 @@ import { LoaderComponent } from './loader/loader.component';
 import { LoaderService } from './loader.service';
 import { LoaderInterceptor } from './loader-interceptor.service';
 import { Globals } from './globals'
+import { TextSelectDirective } from "./text-select.directive";
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { Globals } from './globals'
     LoginComponent,
     LogoutComponent,
     AddTagComponent,
-    LoaderComponent
+    LoaderComponent,
+    TextSelectDirective
   ],
   imports: [
     BrowserModule,

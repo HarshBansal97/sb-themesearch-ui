@@ -5,12 +5,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { DbService } from '../db.service';
 import { Globals } from '../globals';
 
-export interface Tag {
+export interface TagInTable {
   tag: string;
   subCategory: string;
   category: string;
 }
-
 
 @Component({
   selector: 'app-add-tag',
@@ -48,8 +47,8 @@ export class AddTagComponent {
   //   return returnTags;
   // }
   displayedColumns: string[] = ['select', 'tag', 'subCategory', 'category'];
-  dataSource = new MatTableDataSource<Tag>(this.gb.tagsForTable);
-  selection = new SelectionModel<Tag>(true, []);
+  dataSource = new MatTableDataSource<TagInTable>(this.gb.tagsForTable);
+  selection = new SelectionModel<TagInTable>(true, []);
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

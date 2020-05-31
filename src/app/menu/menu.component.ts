@@ -3,8 +3,21 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { AddTagComponent } from '../add-tag/add-tag.component';
 import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@angular/forms';
 import { DbService } from '../db.service';
-import { Globals } from '../globals';
+import { Globals, Tag } from '../globals';
+import { TextSelectEvent } from "../text-select.directive";
 
+export interface PurportSection {
+  start_idx: number;
+  end_idx: number;
+  tags: Tag[];
+}
+
+interface SelectionRectangle {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
 
 @Component({
   selector: 'app-menu',
@@ -13,12 +26,14 @@ import { Globals } from '../globals';
 })
 export class MenuComponent implements OnInit {
 
+  hostRectangle: SelectionRectangle | null;
+
   selectedText: string = '';
 
   staticText: string = "The topics discussed by Dhṛtarāṣṭra\n" +
     "and Sañjaya, as described in the Mahābhārata,\n" +
     "form the basic principle for this great philosophy."
-  errortext:string = '';
+  errortext: string = '';
   verseSelectionForm: FormGroup;
   verseForm: FormGroup;
   // cantos = new Array(12);
@@ -26,8 +41,8 @@ export class MenuComponent implements OnInit {
   // verses = new Array(100);
   translationTagsSelect = new FormControl();
   purportSectionTagsSelect = [];
-  translationTags = [];
-  purportSections = [];
+  translationTags: Tag[] = [];
+  purportSections: PurportSection[] = [];
   fetchedVerse = false;
 
   constructor(
@@ -49,6 +64,9 @@ export class MenuComponent implements OnInit {
       translationText: [''],
       purportText: ['']
     });
+
+    this.hostRectangle = null;
+    this.selectedText = "";
 
     this.getTagsForTable();
     this.onSubmitVerse();
@@ -100,7 +118,7 @@ export class MenuComponent implements OnInit {
       console.log(r);
       if (r.status_code === 200 && r.message === "Successfully fetched translation tags") {
         for (var tag of r.payload) {
-          this.translationTags.push({'tag':tag['tag'], 'subCategory':'', 'category':'', 'disabled': false});
+          this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'disabled': false });
         }
         console.log(JSON.stringify(this.translationTags));
         // GET PURPORT TAGS
@@ -120,14 +138,14 @@ export class MenuComponent implements OnInit {
           if (this.purportSections.length !== 0) {
             var lastPurportSection = this.purportSections[this.purportSections.length - 1];
             if (lastPurportSection['start_idx'] === pst['start_idx'] && lastPurportSection['end_idx'] === pst['end_idx']) {
-              lastPurportSection['tags'].push({'tag':pst['tag'], 'subCategory':'', 'category':'', 'disabled': false});
+              lastPurportSection['tags'].push({ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'disabled': false });
             } else {
               console.log("NEW PURPORT SECTION FOUND");
-              this.purportSections.push({'start_idx':pst['start_idx'], 'end_idx':pst['end_idx'], 'tags': [{'tag':pst['tag'], 'subCategory':'', 'category':'', 'disabled': false}]});
+              this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'disabled': false }] });
             }
           } else {
             console.log("NEW PURPORT SECTION FOUND");
-            this.purportSections.push({'start_idx':pst['start_idx'], 'end_idx':pst['end_idx'], 'tags': [{'tag':pst['tag'], 'subCategory':'', 'category':'', 'disabled': false}]});
+            this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'disabled': false }] });
           }
         }
         console.log(JSON.stringify(this.purportSections));
@@ -180,8 +198,8 @@ export class MenuComponent implements OnInit {
     if (identifier === 'translation') {
       console.log('Removing tags ', this.translationTagsSelect.value)
       if (this.translationTagsSelect.value.length === 0) return;
-      var tag, tagsArray = this.translationTags.slice();
-      for (tag of tagsArray) {
+      var tagsArray = this.translationTags.slice();
+      for (var tag of tagsArray) {
         if (this.translationTagsSelect.value.includes(tag['tag'])) {
           console.log("removing a value");
           var tagIndex = this.translationTags.indexOf(tag);
@@ -192,12 +210,12 @@ export class MenuComponent implements OnInit {
     } else if (identifier === 'purportSection') {
       console.log('Removing tags: ', this.purportSectionTagsSelect[parseInt(index)].toString());
       if (this.purportSectionTagsSelect[parseInt(index)].length === 0) return;
-      var tagsArray: any[] = (this.purportSections[parseInt(index)]['tags']).slice();
+      var tagsArray: Tag[] = (this.purportSections[parseInt(index)]['tags']).slice();
       console.log('Removing tags: CURRENT TAGS PURPORT SECTION', JSON.stringify(tagsArray));
       for (var tag of tagsArray) {
         if (this.purportSectionTagsSelect[parseInt(index)].includes(tag['tag'])) {
           console.log("removing a value");
-          var tagIndex = parseInt(this.purportSections[parseInt(index)]['tags'].indexOf(tag));
+          var tagIndex = this.purportSections[parseInt(index)]['tags'].indexOf(tag);
           this.purportSections[parseInt(index)]['tags'].splice(tagIndex, 1);
         }
       }
@@ -213,6 +231,75 @@ export class MenuComponent implements OnInit {
       this.purportSectionTagsSelect[i] = [];
     }
     console.log('REMOVED PURPORT SECTION ', this.purportSections);
+  }
+
+  renderRectangles(event: TextSelectEvent): void {
+
+    console.group("Text Select Event");
+    console.log("Text:", event.text);
+    console.log("Viewport Rectangle:", event.viewportRectangle);
+    console.log("Host Rectangle:", event.hostRectangle);
+    console.groupEnd();
+
+    // If a new selection has been created, the viewport and host rectangles will
+    // exist. Or, if a selection is being removed, the rectangles will be null.
+    if (event.hostRectangle) {
+
+      this.hostRectangle = event.hostRectangle;
+      this.selectedText = event.text;
+
+    } else {
+
+      this.hostRectangle = null;
+      this.selectedText = "";
+
+    }
+
+  }
+
+  addPurportSection(): void {
+
+    console.group("Shared Text");
+    console.log(this.selectedText);
+    console.groupEnd();
+
+    this.selectedText = window.getSelection().toString();
+    var newSection = {
+      'start_idx': this.verseForm.controls['purportText'].value.search(this.selectedText),
+      'end_idx': this.verseForm.controls['purportText'].value.search(this.selectedText) + this.selectedText.length - 1,
+      'tags': []
+    }
+    // are indexes valid?
+    if (newSection['start_idx'] >= 0 && newSection['end_idx'] <= this.verseForm.controls['purportText'].value.length - 1) {
+      console.log('NEW SECTION ', newSection);
+      this.purportSectionTagsSelect.push([]);
+      for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
+        this.purportSectionTagsSelect[i] = [];
+      }
+      this.purportSections.push(newSection);
+      this.purportSections.sort(function (a, b) { return a['start_idx'] === b['start_idx'] ? a['end_idx'] - b['end_idx'] : a['start_idx'] - b['start_idx'] });
+      console.log('SORTED PURPORT SECTIONS ', this.purportSections);
+      var indexNewSection = this.purportSections.lastIndexOf(newSection);
+      if (this.checkNoExactOverlap(indexNewSection)) {
+        this.addTag('purportSection', indexNewSection);
+      } else {
+        this.purportSections.splice(indexNewSection, 1);
+        this.purportSectionTagsSelect.pop();
+        for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
+          this.purportSectionTagsSelect[i] = [];
+        }
+        console.log('DUPLICATE PURPORT SECTION FOUND! ', this.purportSections);
+      }
+    }
+    // Now that we've shared the text, let's clear the current selection.
+    document.getSelection().removeAllRanges();
+    // CAUTION: In modern browsers, the above call triggers a "selectionchange"
+    // event, which implicitly calls our renderRectangles() callback. However,
+    // in IE, the above call doesn't appear to trigger the "selectionchange"
+    // event. As such, we need to remove the host rectangle explicitly.
+    this.hostRectangle = null;
+    this.selectedText = "";
+
   }
 
   addSection() {
@@ -236,7 +323,7 @@ export class MenuComponent implements OnInit {
           this.purportSectionTagsSelect[i] = [];
         }
         this.purportSections.push(newSection);
-        this.purportSections.sort(function (a, b) { return a['start_idx'] === b['start_idx'] ? parseInt(a['end_idx']) - parseInt(b['end_idx']) : parseInt(a['start_idx']) - parseInt(b['start_idx']) });
+        this.purportSections.sort(function (a, b) { return a['start_idx'] === b['start_idx'] ? a['end_idx'] - b['end_idx'] : a['start_idx'] - b['start_idx'] });
         console.log('SORTED PURPORT SECTIONS ', this.purportSections);
         var indexNewSection = this.purportSections.lastIndexOf(newSection);
         if (this.checkNoExactOverlap(indexNewSection)) {
@@ -292,14 +379,14 @@ export class MenuComponent implements OnInit {
   }
 
   getPurportSectionText(index) {
-    return this.verseForm.controls['purportText'].value.slice(parseInt(this.purportSections[index]['start_idx']), parseInt(this.purportSections[index]['end_idx']) + 1);
+    return this.verseForm.controls['purportText'].value.slice(this.purportSections[index]['start_idx'], this.purportSections[index]['end_idx'] + 1);
   }
 
   onSubmitChanges() {
-    var verse_id = this.verseSelectionForm.controls['canto'].value+'.'+this.verseSelectionForm.controls['chapter'].value+'.'+this.verseSelectionForm.controls['verse'].value;
+    var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
     var translationtags = [];
     for (var tag of this.translationTags) {
-      translationtags.push({'tag':tag['tag']});
+      translationtags.push({ 'tag': tag['tag'] });
     }
     var translationTagsData = {
       "verse_id": verse_id,
@@ -317,7 +404,7 @@ export class MenuComponent implements OnInit {
     var purportsectiontags = [];
     for (var ps of this.purportSections) {
       for (var tag of ps['tags']) {
-        purportsectiontags.push({'start_idx':ps['start_idx'], 'end_idx':ps['end_idx'], 'tag':tag['tag']});
+        purportsectiontags.push({ 'start_idx': ps['start_idx'], 'end_idx': ps['end_idx'], 'tag': tag['tag'] });
       }
     }
     var purportsectionTagsData = {
