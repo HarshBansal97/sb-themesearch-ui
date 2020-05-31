@@ -1,10 +1,10 @@
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+  <div class="row" style="background-color:rgb(245, 244, 244); padding-top: 20px;">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="form-group">
         <form [formGroup]="verseSelectionForm">
           <div class="row">
-            <div class="col-xs-12 col-sm-6 col-md-2">
+            <div class="col-xs-12 col-sm-6 col-md-3">
               <mat-form-field class="col-sm-12">
                 <input matInput placeholder="Canto" name="canto" formControlName="canto">
                 <!-- <select matNativeControl formControlName="canto" placeholder="Canto">
@@ -13,20 +13,20 @@
               </mat-form-field>
             </div>
 
-            <div class="col-xs-12 col-sm-6 col-md-2">
+            <div class="col-xs-12 col-sm-6 col-md-3">
               <mat-form-field class="col-sm-12">
                 <input matInput placeholder="Chapter" name="chapter" formControlName="chapter">
               </mat-form-field>
             </div>
 
-            <div class="col-xs-12 col-sm-6 col-md-2">
+            <div class="col-xs-12 col-sm-6 col-md-3">
               <mat-form-field class="col-sm-12">
-                <input matInput placeholder="Verse Number(s)" name="verse" formControlName="verse">
+                <input matInput placeholder="Verse Number" name="verse" formControlName="verse">
               </mat-form-field>
             </div>
 
-            <div class="col-xs-12 col-sm-6 col-md-2">
-              <button type="submit" color="primary" class="btn-info btn mt-2 float-left" (click)="onSubmitVerse()">
+            <div class="col-xs-12 col-sm-6 col-md-3">
+              <button mat-raised-button type="submit" color="primary" class="" (click)="onSubmitVerse()">
                 Search
               </button>
             </div>
@@ -54,7 +54,7 @@
 
     </div>
   </div> -->
-  <div *ngIf="fetchedVerse">
+  <!-- <div *ngIf="fetchedVerse">
     <div class="form-group">
       <form [formGroup]="verseForm" class="border">
         <div class="row">
@@ -93,11 +93,11 @@
               Add
             </button>
           </div>
-          <!-- <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
+          <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
             <button type="submit" class="btn-warning btn mt-2 full-width" (click)="removeTag('translation',-1)">
               Remove
             </button>
-          </div> -->
+          </div>
           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
             <button type="submit" class="btn-primary btn mt-2 float-right" (click)="addSection()">
               Add Section
@@ -130,49 +130,71 @@
                     Add
                   </button>
                 </div>
-                <!-- <div class="col-xs-3">
+                <div class="col-xs-3">
                   <button class="btn-warning btn mt-2 full-width" (click)="removeTag('purportSection', i)">
                     Remove
                   </button>
-                </div> -->
+                </div>
               </div>
-              <!-- <div class="row">
+              <div class="row">
                 <div class="col-xs-6">
                   <button class="btn-danger btn mt-2 float-left" (click)="removeSection(i)">
                     Remove Section
                   </button>
                 </div>
-              </div> -->
+              </div>
             </div>
           </div>
         </div>
-        <!-- <div class="col-lg-3">
-          <mat-form-field class="example-full-width col-sm-12">
-            <mat-label>Static Text</mat-label>
-            <textarea matInput>{{staticText}}</textarea>
-          </mat-form-field>
-        </div> -->
-        <!-- <div class="col-lg-3">
-          <button class="common-btn btn mt-2 float-left" (click)="addTag()">
-            Add Tag
-          </button>
-        </div> -->
-
       </div>
-
     </div>
-    <br>
-    <br>
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-4">
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
-        <button class="btn-primary btn mt-2 full-width" (click)="onSubmitChanges()">
-          Submit Changes
-        </button>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
-      </div>
+  </div> -->
+
+  <div style="margin-left: 10%; margin-right: 10%;">
+    <!--From here the text area begins-->
+    <div style="margin: 30px 0px;">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+          <mat-panel-title>
+            Verse
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <p style="text-align: center; font-size: large; padding: 0px 40px;"><span id="vData"></span></p>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+          <mat-panel-title>
+            Translation
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      
+        <p style="text-align: justify; font-size: large; font-weight: bold; padding: 0px 40px;"><span id="tData"></span></p>
+      
+        <mat-action-row>
+          <div *ngFor="let Ttags of translationTags; let j=index;">
+            <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px;">
+              <button mat-button style="margin-left: 0px; min-width: 50px;">{{Ttags['tag']}}</button>
+              <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;" (click)="removeTag('translation', -1, j)">&times;</button>
+            </div>
+          </div>
+          <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+        </mat-action-row>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+          <mat-panel-title>
+            Purport
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      
+        <p style="text-align: justify; font-size: large; padding: 0px 40px;"><span id="pData"></span></p>
+      
+        <mat-action-row>
+          <button mat-button (click)="addSection()">Create section</button>
+        </mat-action-row>
+      </mat-expansion-panel>
     </div>
   </div>
 </div>

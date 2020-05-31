@@ -19,6 +19,11 @@ import { LoaderInterceptor } from './loader-interceptor.service';
 import { Globals } from './globals'
 import { TextSelectDirective } from "./text-select.directive";
 
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,6 +43,10 @@ import { TextSelectDirective } from "./text-select.directive";
     DemoMaterialModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    MatExpansionModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   entryComponents: [
     AddTagComponent

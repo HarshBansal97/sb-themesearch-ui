@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div id="overlay" class="container-fluid">
   <div class="login-image">
     <div class="center-both">
       <mat-card class="login-card">
@@ -14,7 +14,7 @@
             </mat-form-field>
             <mat-form-field>
               <input matInput type="password" placeholder="Password" name="pwd" [(ngModel)]='password'>
-              <mat-hint align="end">Forgot Password?</mat-hint>
+              <!--mat-hint align="end">Forgot Password?</mat-hint-->
             </mat-form-field>
             <button class="jio-long-button" (click)="validateLogin()">
               Submit

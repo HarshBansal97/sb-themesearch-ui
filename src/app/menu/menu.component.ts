@@ -19,6 +19,7 @@ interface SelectionRectangle {
   height: number;
 }
 
+
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
@@ -96,9 +97,14 @@ export class MenuComponent implements OnInit {
           this.verseForm.controls['verseText'].setValue(verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms']);
           this.verseForm.controls['translationText'].setValue(verseInfo['translation']);
           this.verseForm.controls['purportText'].setValue(verseInfo['purport']);
-          this.fetchedVerse = true;
+          document.getElementById("vData").innerText = verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms'];
+          document.getElementById("tData").innerText = verseInfo['translation'];
+          document.getElementById("pData").innerText = verseInfo['purport'];
+                    this.fetchedVerse = true;
+          
           // GET TAGS
           this.getTranslationTags();
+          this.getPurportSectionTags();
         } else {
           this.errortext = JSON.stringify('ERROR: unable to fetch the verse');
         }
@@ -122,7 +128,6 @@ export class MenuComponent implements OnInit {
         }
         console.log(JSON.stringify(this.translationTags));
         // GET PURPORT TAGS
-        this.getPurportSectionTags();
       }
     }, (error) => {
       console.log(error);
@@ -193,33 +198,33 @@ export class MenuComponent implements OnInit {
     });
   }
 
-  removeTag(identifier, index): void {
+  removeTag(identifier, index, index2): void {
 
     if (identifier === 'translation') {
-      console.log('Removing tags ', this.translationTagsSelect.value)
-      if (this.translationTagsSelect.value.length === 0) return;
-      var tagsArray = this.translationTags.slice();
-      for (var tag of tagsArray) {
-        if (this.translationTagsSelect.value.includes(tag['tag'])) {
-          console.log("removing a value");
-          var tagIndex = this.translationTags.indexOf(tag);
-          this.translationTags.splice(tagIndex, 1);
-        }
-      }
-      this.translationTagsSelect.setValue('');
+      //console.log('Removing tags ', this.translationTagsSelect.value)
+      //if (this.translationTagsSelect.value.length === 0) return;
+      //var tag, tagsArray = this.translationTags.slice();
+      //for (tag of tagsArray) {
+        //if (this.translationTagsSelect.value.includes(tag['tag'])) {
+          //console.log("removing a value");
+          //var tagIndex = this.translationTags.indexOf(tag);
+      this.translationTags.splice(index2, 1);
+        //}
+      //}
+      //this.translationTagsSelect.setValue('');
     } else if (identifier === 'purportSection') {
-      console.log('Removing tags: ', this.purportSectionTagsSelect[parseInt(index)].toString());
+      //console.log('Removing tags: ', this.purportSectionTagsSelect[parseInt(index)].toString());
       if (this.purportSectionTagsSelect[parseInt(index)].length === 0) return;
-      var tagsArray: Tag[] = (this.purportSections[parseInt(index)]['tags']).slice();
-      console.log('Removing tags: CURRENT TAGS PURPORT SECTION', JSON.stringify(tagsArray));
-      for (var tag of tagsArray) {
-        if (this.purportSectionTagsSelect[parseInt(index)].includes(tag['tag'])) {
-          console.log("removing a value");
-          var tagIndex = this.purportSections[parseInt(index)]['tags'].indexOf(tag);
-          this.purportSections[parseInt(index)]['tags'].splice(tagIndex, 1);
-        }
-      }
-      this.purportSectionTagsSelect[parseInt(index)] = [];
+      //var tagsArray: any[] = (this.purportSections[parseInt(index)]['tags']).slice();
+      //console.log('Removing tags: CURRENT TAGS PURPORT SECTION', JSON.stringify(tagsArray));
+      //for (var tag of tagsArray) {
+        //if (this.purportSectionTagsSelect[parseInt(index)].includes(tag['tag'])) {
+          //console.log("removing a value");
+          //var tagIndex = parseInt(this.purportSections[parseInt(index)]['tags'].indexOf(tag));
+          this.purportSections[parseInt(index)]['tags'].splice(index2, 1);
+        //}
+      //}
+      //this.purportSectionTagsSelect[parseInt(index)] = [];
     }
   }
 
@@ -310,6 +315,7 @@ export class MenuComponent implements OnInit {
     // is it in purport node
     if (window.getSelection().anchorNode.textContent === window.getSelection().focusNode.textContent && window.getSelection().anchorNode.textContent === 'PURPORT') {
       this.selectedText = window.getSelection().toString();
+      console.log(this.selectedText);
       var newSection = {
         'start_idx': this.verseForm.controls['purportText'].value.search(this.selectedText),
         'end_idx': this.verseForm.controls['purportText'].value.search(this.selectedText) + this.selectedText.length - 1,
