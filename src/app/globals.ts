@@ -4,9 +4,9 @@ export interface Tag {
   tag: string;
   subCategory: string;
   category: string;
-//   tagId: number;
-//   tagger: string;
-//   reviewer: string;
+  tag_id: number;
+  tagger: string;
+  reviewer: string;
   disabled: boolean;
 }
 

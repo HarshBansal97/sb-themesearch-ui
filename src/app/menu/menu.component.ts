@@ -23,17 +23,13 @@ interface SelectionRectangle {
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.css']
+  styleUrls: ['./menu.component.css', './menu.component.less']
 })
 export class MenuComponent implements OnInit {
 
   hostRectangle: SelectionRectangle | null;
-
   selectedText: string = '';
 
-  staticText: string = "The topics discussed by Dhṛtarāṣṭra\n" +
-    "and Sañjaya, as described in the Mahābhārata,\n" +
-    "form the basic principle for this great philosophy."
   errortext: string = '';
   verseSelectionForm: FormGroup;
   verseForm: FormGroup;
@@ -45,6 +41,8 @@ export class MenuComponent implements OnInit {
   translationTags: Tag[] = [];
   purportSections: PurportSection[] = [];
   fetchedVerse = false;
+  newPurportSection: string;
+  isReviewer: boolean = false;
 
   constructor(
     public dialog: MatDialog,
@@ -65,11 +63,16 @@ export class MenuComponent implements OnInit {
       translationText: [''],
       purportText: ['']
     });
-
+    if (parseInt(sessionStorage.getItem('account_type')) === 3) {
+      this.isReviewer = true;
+    } else {
+      this.isReviewer = false;
+    }
     this.hostRectangle = null;
     this.selectedText = "";
 
     this.getTagsForTable();
+
     this.onSubmitVerse();
   }
 
@@ -79,6 +82,7 @@ export class MenuComponent implements OnInit {
     let tagsData = this.gb.getTagsFromDB();
     this.gb.parseTags(tagsData);
   }
+
   onSubmitVerse() {
     this.fetchedVerse = false;
     this.translationTags = [];
@@ -100,8 +104,8 @@ export class MenuComponent implements OnInit {
           document.getElementById("vData").innerText = verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms'];
           document.getElementById("tData").innerText = verseInfo['translation'];
           document.getElementById("pData").innerText = verseInfo['purport'];
-                    this.fetchedVerse = true;
-          
+          this.fetchedVerse = true;
+
           // GET TAGS
           this.getTranslationTags();
           this.getPurportSectionTags();
@@ -124,7 +128,7 @@ export class MenuComponent implements OnInit {
       console.log(r);
       if (r.status_code === 200 && r.message === "Successfully fetched translation tags") {
         for (var tag of r.payload) {
-          this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'disabled': false });
+          this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'disabled': false });
         }
         console.log(JSON.stringify(this.translationTags));
         // GET PURPORT TAGS
@@ -143,14 +147,14 @@ export class MenuComponent implements OnInit {
           if (this.purportSections.length !== 0) {
             var lastPurportSection = this.purportSections[this.purportSections.length - 1];
             if (lastPurportSection['start_idx'] === pst['start_idx'] && lastPurportSection['end_idx'] === pst['end_idx']) {
-              lastPurportSection['tags'].push({ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'disabled': false });
+              lastPurportSection['tags'].push({ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'disabled': false });
             } else {
               console.log("NEW PURPORT SECTION FOUND");
-              this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'disabled': false }] });
+              this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'disabled': false }] });
             }
           } else {
             console.log("NEW PURPORT SECTION FOUND");
-            this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'disabled': false }] });
+            this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'disabled': false }] });
           }
         }
         console.log(JSON.stringify(this.purportSections));
@@ -159,20 +163,8 @@ export class MenuComponent implements OnInit {
       console.log(error);
     })
   }
-  // onSubmitVerseText() {
-  //   let data = {
-  //     "verse_id": this.verseSelectionForm.controls['canto'].value+'.'+this.verseSelectionForm.controls['chapter'].value+'.'+this.verseSelectionForm.controls['verse'].value,
-  //     "verse": this.verseForm.controls['verseText'].value,
-  //     "translation": this.verseForm.controls['translationText'].value,
-  //     "purport": this.verseForm.controls['purportText'].value
-  //   }
-  //   console.log("data for create verse, ", data);
-  //   this.db.createVerse(data).subscribe(r => {
-  //     console.log(r);
-  //   }, (error) => {
-  //     console.log(error);
-  //   })
-  // }
+
+  // Any user can add tags for translation, purport section
 
   addTag(identifier, index): void {
 
@@ -180,15 +172,76 @@ export class MenuComponent implements OnInit {
 
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed with result,', result);
-      if (result) {
+    dialogRef.afterClosed().subscribe(rTable => {
+      console.log('The dialog was closed with result,', rTable);
+      if (rTable) { // result not undefined
         if (identifier === 'translation') {
-          this.translationTags = this.translationTags.concat(result);
+          // Make API call to add tags for translation
+          var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+          var translationtags = [];
+          for (var tag of rTable) {
+            // Remove duplicates wrt existing tags for the translation
+            if (!this.checkIfDuplicate(tag['tag'], this.translationTags)) {
+              translationtags.push({ 'tag': tag['tag'] });
+            } else {
+              console.log("DUPLICATE TAG FOUND! ", tag);
+            }
+          }
+          if (translationtags.length !== 0) {
+            var translationTagsData = {
+              "verse_id": verse_id,
+              "translationtags": translationtags
+            }
+            console.log('ADDING TRANSLATION TAGS ', translationTagsData);
+
+            this.db.postTranslationTags(translationTagsData).subscribe(result => {
+              console.log(result);
+              // Once result comes, add tags to translation tags
+              if (result['status_code'] === 201 && result['message'] === "Successfully added translation tags") {
+                for (var tag of result['payload']) {
+                  this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'disabled': false });
+                }
+                console.log(JSON.stringify(this.translationTags));
+              }
+            }, (error) => {
+              console.log(error);
+            })
+          }
         } else if (identifier === 'purportSection') {
           if (parseInt(index) !== -1) {
-            this.purportSections[parseInt(index)]['tags'] = this.purportSections[parseInt(index)]['tags'].concat(result);
-            console.log('ADD TAG: PURPORT ', this.purportSections);
+
+            // Make API call to add tags for purport
+            var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+            var purportsectiontags = [];
+            var ps = this.purportSections[parseInt(index)];
+            for (var tag of rTable) {
+              // Remove duplicates wrt existing tags for the purport section
+              if (!this.checkIfDuplicate(tag['tag'], ps['tags'])) {
+                purportsectiontags.push({ 'start_idx': ps['start_idx'], 'end_idx': ps['end_idx'], 'tag': tag['tag'] });
+              } else {
+                console.log("DUPLICATE TAG FOUND! ", tag);
+              }
+            }
+            if (purportsectiontags.length !== 0) {
+              var purportsectionTagsData = {
+                "verse_id": verse_id,
+                "purporttags": purportsectiontags
+              }
+              console.log('ADDING PURPORT SECTION TAGS ', purportsectionTagsData);
+              this.db.postPurportSectionTags(purportsectionTagsData).subscribe(result => {
+                console.log(result);
+                // Once result comes, add tags to purport section tags
+                if (result['status_code'] === 201 && result['message'] === "Successfully added purport tags") {
+                  for (var tag of result['payload']) {
+                    this.purportSections[parseInt(index)]['tags'].push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'disabled': false });
+                  }
+                  console.log('ADDED TAGS to PURPORT SECTION ' + JSON.stringify(this.purportSections[parseInt(index)]['tags']));
+                }
+              }, (error) => {
+                console.log(error);
+              })
+              console.log('ADD TAG: PURPORT ', this.purportSections);
+            }
           } else {
             console.log('ADD TAG: WRONG INDEX PASSED FOR PURPORT SECTION');
           }
@@ -201,30 +254,52 @@ export class MenuComponent implements OnInit {
   removeTag(identifier, index, index2): void {
 
     if (identifier === 'translation') {
-      //console.log('Removing tags ', this.translationTagsSelect.value)
-      //if (this.translationTagsSelect.value.length === 0) return;
-      //var tag, tagsArray = this.translationTags.slice();
-      //for (tag of tagsArray) {
-        //if (this.translationTagsSelect.value.includes(tag['tag'])) {
-          //console.log("removing a value");
-          //var tagIndex = this.translationTags.indexOf(tag);
-      this.translationTags.splice(index2, 1);
-        //}
-      //}
-      //this.translationTagsSelect.setValue('');
+      // Check permissions
+      if (parseInt(sessionStorage.getItem('account_type')) === 2) {
+        if (this.translationTags[index2]['reviewer'] !== null) {
+          window.alert('Cannot remove tag already reviewed!');
+          return;
+        }
+        if (sessionStorage.getItem('authUsername') !== this.translationTags[index2]['tagger']) {
+          window.alert('Cannot remove tag added by other!');
+          return;
+        }
+      }
+      // Make API call
+      this.db.deleteTranslationTag(this.translationTags[index2]['tag_id']).subscribe(result => {
+        console.log(result);
+        // Once result comes, remove tag from translation tags
+        if (result['status_code'] === 204 && result['message'] === "Successfully deleted translation tag") {
+          this.translationTags.splice(index2, 1);
+        }
+      }, (error) => {
+        console.log(error);
+      })
+
+
     } else if (identifier === 'purportSection') {
-      //console.log('Removing tags: ', this.purportSectionTagsSelect[parseInt(index)].toString());
-      if (this.purportSectionTagsSelect[parseInt(index)].length === 0) return;
-      //var tagsArray: any[] = (this.purportSections[parseInt(index)]['tags']).slice();
-      //console.log('Removing tags: CURRENT TAGS PURPORT SECTION', JSON.stringify(tagsArray));
-      //for (var tag of tagsArray) {
-        //if (this.purportSectionTagsSelect[parseInt(index)].includes(tag['tag'])) {
-          //console.log("removing a value");
-          //var tagIndex = parseInt(this.purportSections[parseInt(index)]['tags'].indexOf(tag));
+      // Check permissions
+      if (parseInt(sessionStorage.getItem('account_type')) === 2) {
+        if (this.purportSections[parseInt(index)]['tags'][index2]['reviewer'] !== null) {
+          window.alert('Cannot remove tag already reviewed!');
+          console.log('')
+          return;
+        }
+        if (sessionStorage.getItem('authUsername') !== this.purportSections[parseInt(index)]['tags']['tagger']) {
+          window.alert('Cannot remove tag added by other!');
+          return;
+        }
+      }
+      // Make API call
+      this.db.deletePurportSectionTag(this.purportSections[parseInt(index)]['tags'][index2]['tag_id']).subscribe(result => {
+        console.log(result);
+        // Once result comes, remove tag from purport section tags
+        if (result['status_code'] === 204 && result['message'] === "Successfully deleted purport tag") {
           this.purportSections[parseInt(index)]['tags'].splice(index2, 1);
-        //}
-      //}
-      //this.purportSectionTagsSelect[parseInt(index)] = [];
+        }
+      }, (error) => {
+        console.log(error);
+      })
     }
   }
 
@@ -268,15 +343,15 @@ export class MenuComponent implements OnInit {
     console.log(this.selectedText);
     console.groupEnd();
 
-    this.selectedText = window.getSelection().toString();
     var newSection = {
-      'start_idx': this.verseForm.controls['purportText'].value.search(this.selectedText),
-      'end_idx': this.verseForm.controls['purportText'].value.search(this.selectedText) + this.selectedText.length - 1,
+      'start_idx': this.verseForm.controls['purportText'].value.indexOf(this.selectedText),
+      'end_idx': this.verseForm.controls['purportText'].value.indexOf(this.selectedText) + this.selectedText.length - 1,
       'tags': []
     }
+    console.log("NEW SECTION SELECTED ", newSection);
     // are indexes valid?
     if (newSection['start_idx'] >= 0 && newSection['end_idx'] <= this.verseForm.controls['purportText'].value.length - 1) {
-      console.log('NEW SECTION ', newSection);
+      console.log('NEW SECTION VALID ', newSection);
       this.purportSectionTagsSelect.push([]);
       for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
         this.purportSectionTagsSelect[i] = [];
@@ -287,6 +362,7 @@ export class MenuComponent implements OnInit {
       var indexNewSection = this.purportSections.lastIndexOf(newSection);
       if (this.checkNoExactOverlap(indexNewSection)) {
         this.addTag('purportSection', indexNewSection);
+        console.log('ADDING NEW PURPORT SECTION!');
       } else {
         this.purportSections.splice(indexNewSection, 1);
         this.purportSectionTagsSelect.pop();
@@ -308,45 +384,33 @@ export class MenuComponent implements OnInit {
   }
 
   addSection() {
-    if (this.verseForm.controls['purportText'].value.length === 0) return;
-    console.log(window.getSelection());
-    console.log('ANCHOR NODE ', window.getSelection().anchorNode.textContent);
-    console.log('FOCUS NODE ', window.getSelection().focusNode.textContent);
-    // is it in purport node
-    if (window.getSelection().anchorNode.textContent === window.getSelection().focusNode.textContent && window.getSelection().anchorNode.textContent === 'PURPORT') {
-      this.selectedText = window.getSelection().toString();
-      console.log(this.selectedText);
-      var newSection = {
-        'start_idx': this.verseForm.controls['purportText'].value.search(this.selectedText),
-        'end_idx': this.verseForm.controls['purportText'].value.search(this.selectedText) + this.selectedText.length - 1,
-        'tags': []
-      }
-      // are indexes valid?
-      if (newSection['start_idx'] >= 0 && newSection['end_idx'] <= this.verseForm.controls['purportText'].value.length - 1) {
-        console.log('NEW SECTION ', newSection);
-        this.purportSectionTagsSelect.push([]);
-        for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
-          this.purportSectionTagsSelect[i] = [];
-        }
-        this.purportSections.push(newSection);
-        this.purportSections.sort(function (a, b) { return a['start_idx'] === b['start_idx'] ? a['end_idx'] - b['end_idx'] : a['start_idx'] - b['start_idx'] });
-        console.log('SORTED PURPORT SECTIONS ', this.purportSections);
-        var indexNewSection = this.purportSections.lastIndexOf(newSection);
-        if (this.checkNoExactOverlap(indexNewSection)) {
-          this.addTag('purportSection', indexNewSection);
-        } else {
-          this.purportSections.splice(indexNewSection, 1);
-          this.purportSectionTagsSelect.pop();
-          for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
-            this.purportSectionTagsSelect[i] = [];
-          }
-          console.log('DUPLICATE PURPORT SECTION FOUND! ', this.purportSections);
-        }
-      }
+    var inputText = this.newPurportSection;
+    console.group("Input Text");
+    console.log(inputText);
+    console.groupEnd();
 
-
+    var newSection = {
+      'start_idx': this.verseForm.controls['purportText'].value.indexOf(inputText),
+      'end_idx': this.verseForm.controls['purportText'].value.indexOf(inputText) + inputText.length - 1,
+      'tags': []
     }
-
+    console.log("NEW SECTION SELECTED ", newSection);
+    // are indexes valid?
+    if (newSection['start_idx'] >= 0 && newSection['end_idx'] <= this.verseForm.controls['purportText'].value.length - 1) {
+      console.log('NEW SECTION VALID ', newSection);
+      this.purportSections.push(newSection);
+      this.purportSections.sort(function (a, b) { return a['start_idx'] === b['start_idx'] ? a['end_idx'] - b['end_idx'] : a['start_idx'] - b['start_idx'] });
+      console.log('SORTED PURPORT SECTIONS ', this.purportSections);
+      var indexNewSection = this.purportSections.lastIndexOf(newSection);
+      if (this.checkNoExactOverlap(indexNewSection)) {
+        this.addTag('purportSection', indexNewSection);
+        console.log('ADDING NEW PURPORT SECTION!');
+      } else {
+        this.purportSections.splice(indexNewSection, 1);
+        console.log('DUPLICATE PURPORT SECTION FOUND! ', this.purportSections);
+      }
+    }
+    this.newPurportSection = "";
     //console.log("Selected Substring starts at index:", this.staticText.search(this.selectedText)," and ends at index:", this.staticText.search(this.selectedText)+this.selectedText.length-1)
   }
 
@@ -384,8 +448,81 @@ export class MenuComponent implements OnInit {
 
   }
 
+  checkIfDuplicate(tagValue, existingTagArray) {
+    for (var tag of existingTagArray) {
+      if (tag['tag'] === tagValue) return true;
+    }
+    return false;
+  }
+
   getPurportSectionText(index) {
     return this.verseForm.controls['purportText'].value.slice(this.purportSections[index]['start_idx'], this.purportSections[index]['end_idx'] + 1);
+  }
+
+  approveTranslationTags(tagIndexArray, psTagIndexArray) {
+    if (tagIndexArray.length === 0) {
+      this.approvePurportSectionTags(psTagIndexArray);
+    }
+    var i = tagIndexArray.pop();
+    var data = {
+      "verse_id": "1.1.1",
+      "purport": "Purport by H.D.G Abhayacaranaravinda Bhaktivedanta Swami Srila Prabhupada"
+    }
+    this.db.approveTranslationTag(this.translationTags[i]['tag_id'], data).subscribe(result => {
+      console.log(result);
+      // Once result comes, add reviewer for the translation tag
+      if (result['status_code'] === 202 && result['message'] === "Successfully reviewed translation tag") {
+        this.translationTags[i]['reviewer'] = sessionStorage.getItem('authUsername');
+        console.log('APPROVED TAG ', this.translationTags[i]);
+        this.approveTranslationTags(tagIndexArray, psTagIndexArray);
+      }
+    }, (error) => {
+      console.log(error);
+    })
+  }
+
+  approvePurportSectionTags(psTagIndexArray) {
+
+    if (psTagIndexArray.length === 0) return;
+    var i = psTagIndexArray.pop();
+    var data = {
+      "verse_id": "1.1.1",
+      "purport": "Purport by H.D.G Abhayacaranaravinda Bhaktivedanta Swami Srila Prabhupada"
+    }
+    this.db.approvePurportSectionTag(this.purportSections[i['psIndex']]['tags'][i['pstIndex']]['tag_id'], data).subscribe(result => {
+      console.log(i);
+      // Once result comes, add reviewer for the purport tag
+      if (result['status_code'] === 202 && result['message'] === "Successfully reviewed purport tag") {
+        this.purportSections[i['psIndex']]['tags'][i['pstIndex']]['reviewer'] = sessionStorage.getItem('authUsername');
+        console.log('APPROVED TAG ', this.purportSections[i['psIndex']]['tags'][i['pstIndex']]);
+        this.approvePurportSectionTags(psTagIndexArray);
+      }
+    }, (error) => {
+      console.log(error);
+    })
+  }
+
+  approveCurrentTags() {
+    var translationTagIndexArray = [];
+    for (let i = 0; i < this.translationTags.length; i++) {
+      if (this.translationTags[i]['reviewer'] === null) {
+        translationTagIndexArray.push(i);
+      }
+    }
+
+    var psTagIndexArray = [];
+
+    for (let i = 0; i < this.purportSections.length; i++) {
+      for (let j = 0; j < this.purportSections[i]['tags'].length; j++) {
+        if (this.purportSections[i]['tags'][j]['reviewer'] === null) {
+          psTagIndexArray.push({ 'psIndex': i, 'pstIndex': j });
+
+        }
+      }
+    }
+
+    this.approveTranslationTags(translationTagIndexArray, psTagIndexArray);
+
   }
 
   onSubmitChanges() {
