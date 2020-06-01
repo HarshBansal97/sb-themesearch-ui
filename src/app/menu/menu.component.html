@@ -136,163 +136,305 @@
     </div>
   </div> -->
 
-  <div style="margin-left: 10%; margin-right: 10%; margin-bottom: 20px">
-    <!--From here the text area begins-->
-    <div style="margin: 30px 0px;">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
-          <mat-panel-title>
-            Verse
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <p style="text-align: center; font-size: large; padding: 10px 40px;"><span id="vData"></span></p>
-      </mat-expansion-panel>
-      
-      <mat-expansion-panel>
-        <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
-          <mat-panel-title>
-            Translation
-          </mat-panel-title>
-        </mat-expansion-panel-header>
+  <mat-horizontal-stepper [linear]="isLinear" #stepper>
+    <mat-step [stepControl]="firstFormGroup" [completed]="false">
+      <ng-template matStepLabel>Edit Section</ng-template>
+      <div style="margin-left: 10%; margin-right: 10%; margin-bottom: 20px">
+        <!--From here the text area begins-->
+        <div style="margin: 30px 0px;">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+              <mat-panel-title>
+                Verse
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <p style="text-align: center; font-size: large; padding: 10px 40px;"><span id="vData"></span></p>
+          </mat-expansion-panel>
 
-        <p style="text-align: justify; font-size: large; font-weight: bold; padding: 0px 40px;"><span id="tData"></span>
-        </p>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+              <mat-panel-title>
+                Translation
+              </mat-panel-title>
+            </mat-expansion-panel-header>
 
-        <mat-action-row>
-          <div *ngFor="let Ttags of translationTags; let j=index;">
-            <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px;"
-              matTooltip="tagger:{{Ttags['tagger']}}, reviewer:{{Ttags['reviewer']}}" matTooltipPosition="above">
-              <button type="button" class="btn"
-                [ngClass]="{'btn-warning':Ttags['reviewer'] === null, 'btn-success':Ttags['reviewer'] !== null}"
-                style="margin-left: 0px; min-width: 50px;">{{Ttags['tag']}}</button>
-              <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
-                (click)="removeTag('translation', -1, j)">&times;</button>
-            </div>
-          </div>
-          <button mat-button (click)="addTag('translation',-1)">Add tag</button>
-        </mat-action-row>
-      </mat-expansion-panel>
+            <p style="text-align: justify; font-size: large; font-weight: bold; padding: 0px 40px;"><span
+                id="tData"></span>
+            </p>
 
-      <mat-expansion-panel>
-        <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
-          <mat-panel-title>
-            Purport
-          </mat-panel-title>
-        </mat-expansion-panel-header>
+            <mat-action-row>
+              <div class="row" style="width: 100%">
+                <div class="col-sm-10">
+                  <div class="row" style="overflow: scroll; white-space: nowrap;">
+                    <div *ngFor="let Ttags of translationTags; let j=index;" style="white-space: nowrap;">
 
-        <div style="text-align: justify; font-size: large; padding: 0px 40px;">
+                      <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px; width: fit-content;"
+                        matTooltip="tagger:{{Ttags['tagger']}}, reviewer:{{Ttags['reviewer']}}"
+                        matTooltipPosition="above">
+                        <button type="button" class="btn"
+                          [ngClass]="{'btn-warning':Ttags['reviewer'] === null, 'btn-success':Ttags['reviewer'] !== null}"
+                          style="margin-left: 0px; min-width: 50px;">{{Ttags['tag']}}</button>
+                        <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
+                          (click)="removeTag('translation', -1, j)">&times;</button>
+                      </div>
+                    </div>
+                  </div>
 
-          <div (textSelect)="renderRectangles( $event )" style="position:relative">
-            <span id="pData"></span>
-            <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left"
-              [style.top.px]="hostRectangle.top" [style.width.px]="hostRectangle.width" [style.height.px]="0">
-
-              <div class="indicator__cta">
-                <a (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation(); addPurportSection()"
-                  class="indicator__cta-link">
-                  Add Section
-                </a>
+                </div>
+                <div class="col-sm-2">
+                  <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+                </div>
               </div>
+              <!-- <div *ngFor="let Ttags of translationTags; let j=index;">
 
+                <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px;"
+                  matTooltip="tagger:{{Ttags['tagger']}}, reviewer:{{Ttags['reviewer']}}" matTooltipPosition="above">
+                  <button type="button" class="btn"
+                    [ngClass]="{'btn-warning':Ttags['reviewer'] === null, 'btn-success':Ttags['reviewer'] !== null}"
+                    style="margin-left: 0px; min-width: 50px;">{{Ttags['tag']}}</button>
+                  <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
+                    (click)="removeTag('translation', -1, j)">&times;</button>
+                </div>
+                <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+              </div> -->
+            </mat-action-row>
+          </mat-expansion-panel>
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+              <mat-panel-title>
+                Purport
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div style="text-align: justify; font-size: large; padding: 0px 40px;">
+
+              <div (textSelect)="renderRectangles( $event )" style="position:relative">
+                <span id="pData"></span>
+                <div *ngIf="hostRectangle" class="indicator" [style.left.px]="hostRectangle.left"
+                  [style.top.px]="hostRectangle.top" [style.width.px]="hostRectangle.width" [style.height.px]="0">
+
+                  <div class="indicator__cta">
+                    <a (mousedown)="$event.preventDefault()" (mouseup)="$event.stopPropagation(); addPurportSection()"
+                      class="indicator__cta-link">
+                      Add Section
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- <mat-action-row>
+              <button mat-button (click)="addSection()">Create section</button>
+            </mat-action-row> -->
+          </mat-expansion-panel>
+
+          <!--put new sections here after adding a line and leaving a gap-->
+
+
+          <div *ngFor="let ps of purportSections; let i=index;">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
+                <mat-panel-title>
+                  Purport Section {{i+1}}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <p style="text-align: justify; font-size: large; font-weight: bold; padding: 10px 40px;">
+                {{getPurportSectionText(i)}}
+              </p>
+
+              <mat-action-row>
+                <div class="row" style="width: 100%">
+                  <div class="col-sm-10">
+                    <div class="row" style="overflow: scroll; white-space: nowrap;">
+                      <div *ngFor="let PStag of ps.tags; let j=index;" style="white-space: nowrap;">
+
+                        <div
+                          style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px; width: fit-content;"
+                          matTooltip="tagger:{{PStag['tagger']}}, reviewer:{{PStag['reviewer']}}"
+                          matTooltipPosition="above">
+                          <button type="button" class="btn"
+                            [ngClass]="{'btn-warning':PStag['reviewer'] === null, 'btn-success':PStag['reviewer'] !== null}"
+                            style="margin-left: 0px;">{{PStag['tag']}}</button>
+                          <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
+                            (click)="removeTag('purportSection', i, j)">&times;</button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="col-sm-2">
+                    <button mat-button (click)="addTag('purportSection',i)">Add tag</button>
+                  </div>
+                </div>
+
+
+              </mat-action-row>
+            </mat-expansion-panel>
+
+            <!--purport sections-->
+
+
+            <!-- <div class="col-md-4">
+            <div class="purportSectionCard">
+              <div class="row">
+                <mat-form-field appearance="outline" class="col-xs-12">
+                  <mat-label>Purport Section</mat-label>
+                  <textarea matInput rows="5" readonly></textarea>
+                </mat-form-field>
+              </div>
+              <div class="row">
+                <div class="col-xs-9">
+                  <mat-form-field class="col-sm-12">
+                    <mat-label>Tags</mat-label>
+                    <mat-select [(value)]='purportSectionTagsSelect[i]' multiple>
+                      <mat-option *ngFor="let tag of ps.tags" [value]="tag.tag" [disabled]="tag.disabled">
+                        {{tag.tag}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-xs-3">
+                  <button class="btn-primary btn mt-2 full-width" (click)="addTag('purportSection', i)">
+                    Add
+                  </button>
+                </div>
+                <div class="col-xs-3">
+                  <button class="btn-warning btn mt-2 full-width" (click)="removeTag('purportSection', i)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  <button class="btn-danger btn mt-2 float-left" (click)="removeSection(i)">
+                    Remove Section
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          </div>
+          <div class="row">
+            <mat-form-field appearance="outline" class="col-md-12">
+              <mat-label>New Purport Section</mat-label>
+              <textarea rows="1" matInput [(ngModel)]='newPurportSection'></textarea>
+            </mat-form-field>
+          </div>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-2">
+              <button class="btn-info btn mt-2 full-width" (click)="addSection()">
+                Add Purport Section
+              </button>
             </div>
           </div>
         </div>
+      </div>
+      <div align="center">
+        <button mat-raised-button matStepperNext color="primary">Proceed to review page</button>
+      </div>
+    </mat-step>
+    <mat-step [stepControl]="secondFormGroup" [completed]="false">
+      <ng-template matStepLabel>Review Section</ng-template>
+      <div style="margin-left: 10%; margin-right: 10%;">
+        <!--From here the text area begins-->
+        <div style="margin: 30px 0px;">
+          <mat-card>
+            <div>
+              <strong style="font-size: x-large;">Translation</strong>
+              <p style="text-align: justify; font-size: large; font-weight: bold; padding: 0px 40px;">{{vf.translationText.value}}
+              </p>
 
-        <!-- <mat-action-row>
-          <button mat-button (click)="addSection()">Create section</button>
-        </mat-action-row> -->
-      </mat-expansion-panel>
+              <div class="row" style="width: 100%">
+                <div class="col-sm-12">
+                  <div class="row" style="overflow: scroll; white-space: nowrap;">
+                    <div *ngFor="let Ttags of translationTags; let j=index;" style="white-space: nowrap;">
 
-      <div *ngFor="let ps of purportSections; let i=index;">
-        <mat-expansion-panel>
-          <mat-expansion-panel-header style="background-color: rgb(245, 244, 244);">
-            <mat-panel-title>
-              Purport Section {{i+1}}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <p style="text-align: justify; font-size: large; font-weight: bold; padding: 10px 40px;">
-            {{getPurportSectionText(i)}}
-          </p>
-
-          <mat-action-row>
-            <div *ngFor="let PStag of ps.tags; let j=index;">
-              <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px;"
-                matTooltip="tagger:{{PStag['tagger']}}, reviewer:{{PStag['reviewer']}}" matTooltipPosition="above">
-                <button type="button" class="btn"
-                  [ngClass]="{'btn-warning':PStag['reviewer'] === null, 'btn-success':PStag['reviewer'] !== null}"
-                  style="margin-left: 0px; min-width: 50px;">{{PStag['tag']}}</button>
-                <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
-                  (click)="removeTag('purportSection', i, j)">&times;</button>
+                      <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px; width: fit-content;"
+                        matTooltip="tagger:{{Ttags['tagger']}}, reviewer:{{Ttags['reviewer']}}"
+                        matTooltipPosition="above">
+                        <button type="button" class="btn"
+                          [ngClass]="{'btn-warning':Ttags['reviewer'] === null, 'btn-success':Ttags['reviewer'] !== null}"
+                          style="margin-left: 0px; min-width: 50px;">{{Ttags['tag']}}</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+              <!-- <div *ngFor="let Ttags of translationTags; let j=index;">
+
+                <div style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px;"
+                  matTooltip="tagger:{{Ttags['tagger']}}, reviewer:{{Ttags['reviewer']}}" matTooltipPosition="above">
+                  <button type="button" class="btn"
+                    [ngClass]="{'btn-warning':Ttags['reviewer'] === null, 'btn-success':Ttags['reviewer'] !== null}"
+                    style="margin-left: 0px; min-width: 50px;">{{Ttags['tag']}}</button>
+                  <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
+                    (click)="removeTag('translation', -1, j)">&times;</button>
+                </div>
+                <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+                </div> -->
+                <!-- <p style="text-align: justify; font-size: large; padding: 0px 40px;">
+                                {{this.verseForm.controls['translationText'].value}}</p>
+                              <div *ngFor="let Ttags of translationTags; let j=index;" class="tagSpace">
+                                <p class="combineButton">
+                                  <button mat-button class="tagButton">{{Ttags['tag']}}</button> 
+                </p> 
+              </div> -->
             </div>
-            <button mat-button (click)="addTag('purportSection',i)">Add tag</button>
-          </mat-action-row>
-        </mat-expansion-panel>
+          </mat-card>
+        </div>
 
-        <!-- <div class="col-md-4">
-          <div class="purportSectionCard">
-            <div class="row">
-              <mat-form-field appearance="outline" class="col-xs-12">
-                <mat-label>Purport Section</mat-label>
-                <textarea matInput rows="5" readonly></textarea>
-              </mat-form-field>
-            </div>
-            <div class="row">
-              <div class="col-xs-9">
-                <mat-form-field class="col-sm-12">
-                  <mat-label>Tags</mat-label>
-                  <mat-select [(value)]='purportSectionTagsSelect[i]' multiple>
-                    <mat-option *ngFor="let tag of ps.tags" [value]="tag.tag" [disabled]="tag.disabled">
-                      {{tag.tag}}</mat-option>
-                  </mat-select>
-                </mat-form-field>
+        <!--put new sections here after adding a line and leaving a gap-->
+        <div *ngFor="let ps of purportSections; let i=index;">
+          <div style="margin: 30px 0px;">
+            <mat-card>
+              <div>
+                <strong style="font-size: x-large;">Purport Section {{i+1}}</strong>
+                <p style="text-align: justify; font-size: large; font-weight: bold; padding: 0px 40px;">{{getPurportSectionText(i)}}
+                </p>
+
+                <div class="row" style="width: 100%">
+                  <div class="col-sm-12">
+                    <div class="row" style="overflow: scroll; white-space: nowrap;">
+                      <div *ngFor="let PStag of ps.tags; let j=index;" style="white-space: nowrap;">
+
+                        <div
+                          style="padding: 0px; background-color:rgb(252, 245, 205); margin: 10px; width: fit-content;"
+                          matTooltip="tagger:{{PStag['tagger']}}, reviewer:{{PStag['reviewer']}}"
+                          matTooltipPosition="above">
+                          <button type="button" class="btn"
+                            [ngClass]="{'btn-warning':PStag['reviewer'] === null, 'btn-success':PStag['reviewer'] !== null}"
+                            style="margin-left: 0px;">{{PStag['tag']}}</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-xs-3">
-                <button class="btn-primary btn mt-2 full-width" (click)="addTag('purportSection', i)">
-                  Add
-                </button>
-              </div>
-              <div class="col-xs-3">
-                <button class="btn-warning btn mt-2 full-width" (click)="removeTag('purportSection', i)">
-                  Remove
-                </button>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-xs-6">
-                <button class="btn-danger btn mt-2 float-left" (click)="removeSection(i)">
-                  Remove Section
-                </button>
-              </div>
-            </div>
+            </mat-card>
           </div>
-        </div> -->
+        </div>
+
+
       </div>
-    </div>
-    <div class="row">
-      <mat-form-field appearance="outline" class="col-md-12">
-        <mat-label>New Purport Section</mat-label>
-        <textarea rows="1" matInput [(ngModel)]='newPurportSection'></textarea>
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-2">
-        <button class="btn-info btn mt-2 full-width" (click)="addSection()">
-          Add Purport Section
-        </button>
+      <div align="center">
+        <button mat-raised-button matStepperPrevious color="primary">Back</button>
+        <br>
+        <br>
+        <br>
+        <div *ngIf="isReviewer" class="row">
+          <div class="col-xs-12 col-sm-12 col-md-4">
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-4">
+            <button class="btn-success btn mt-2 full-width" (click)="approveCurrentTags()">
+              APPROVE
+            </button>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-4">
+          </div>
+        </div>
       </div>
-    </div>
-    <div *ngIf="isReviewer" class="row">
-      <div class="col-xs-12 col-sm-12 col-md-4">
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
-        <button class="btn-success btn mt-2 full-width" (click)="approveCurrentTags()">
-          APPROVE
-        </button>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4">
-      </div>
-    </div>
-  </div>
+    </mat-step>
+  </mat-horizontal-stepper>
 </div>

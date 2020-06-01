@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@ang
 import { DbService } from '../db.service';
 import { Globals, Tag } from '../globals';
 import { TextSelectEvent } from "../text-select.directive";
+import { Router } from '@angular/router';
 
 export interface PurportSection {
   start_idx: number;
@@ -45,11 +46,16 @@ export class MenuComponent implements OnInit {
   isReviewer: boolean = false;
 
   constructor(
+    private route: Router,
     public dialog: MatDialog,
     private fb: FormBuilder,
     private db: DbService,
     public gb: Globals,
-  ) { }
+    
+  ) { 
+    this.hostRectangle = null;
+		this.selectedText = "";
+}
 
   ngOnInit() {
     this.verseSelectionForm = this.fb.group({
@@ -562,5 +568,7 @@ export class MenuComponent implements OnInit {
     })
 
   }
-
+  proceedReviewPage (){
+    this.route.navigate(['review-page']);
+  }
 }

@@ -3,6 +3,26 @@
     min-height: 100vh;
 }
 */
+.closeButton{
+    min-width: 30px;
+}
+.tagButton{
+    min-width: fit-content;
+}
+.combineButton{
+    padding: 0px;
+    background-color:rgb(255, 253, 241);
+    margin-left: 10px;
+    margin-right: 10px;
+    width: fit-content;
+    white-space: normal;
+    overflow: hidden;
+}
+.tagSpace{
+    width: 100%;
+    white-space: normal;
+    overflow: hidden;
+}
 .center-child {
   display: flex;
   justify-content: center;
