@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AddTagComponent } from '../add-tag/add-tag.component';
+import { TagRemarkComponent } from '../tag-remark/tag-remark.component';
 import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@angular/forms';
 import { DbService } from '../db.service';
 import { Globals, Tag } from '../globals';
@@ -30,7 +31,9 @@ export class MenuComponent implements OnInit {
 
   hostRectangle: SelectionRectangle | null;
   selectedText: string = '';
-
+  isLinear;
+  firstFormGroup;
+  secondFormGroup;
   errortext: string = '';
   verseSelectionForm: FormGroup;
   verseForm: FormGroup;
@@ -51,11 +54,11 @@ export class MenuComponent implements OnInit {
     private fb: FormBuilder,
     private db: DbService,
     public gb: Globals,
-    
-  ) { 
+
+  ) {
     this.hostRectangle = null;
-		this.selectedText = "";
-}
+    this.selectedText = "";
+  }
 
   ngOnInit() {
     this.verseSelectionForm = this.fb.group({
@@ -134,7 +137,7 @@ export class MenuComponent implements OnInit {
       console.log(r);
       if (r.status_code === 200 && r.message === "Successfully fetched translation tags") {
         for (var tag of r.payload) {
-          this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'disabled': false });
+          this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'tagger_remark': tag['tagger_remark'], 'disabled': false });
         }
         console.log(JSON.stringify(this.translationTags));
         // GET PURPORT TAGS
@@ -153,14 +156,14 @@ export class MenuComponent implements OnInit {
           if (this.purportSections.length !== 0) {
             var lastPurportSection = this.purportSections[this.purportSections.length - 1];
             if (lastPurportSection['start_idx'] === pst['start_idx'] && lastPurportSection['end_idx'] === pst['end_idx']) {
-              lastPurportSection['tags'].push({ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'disabled': false });
+              lastPurportSection['tags'].push({ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'tagger_remark': pst['tagger_remark'], 'disabled': false });
             } else {
               console.log("NEW PURPORT SECTION FOUND");
-              this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'disabled': false }] });
+              this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'tagger_remark': pst['tagger_remark'], 'disabled': false }] });
             }
           } else {
             console.log("NEW PURPORT SECTION FOUND");
-            this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'disabled': false }] });
+            this.purportSections.push({ 'start_idx': pst['start_idx'], 'end_idx': pst['end_idx'], 'tags': [{ 'tag': pst['tag'], 'subCategory': '', 'category': '', 'tag_id': pst['tag_id'], 'tagger': pst['tagger'], 'reviewer': pst['reviewer'], 'tagger_remark': pst['tagger_remark'], 'disabled': false }] });
           }
         }
         console.log(JSON.stringify(this.purportSections));
@@ -205,7 +208,7 @@ export class MenuComponent implements OnInit {
               // Once result comes, add tags to translation tags
               if (result['status_code'] === 201 && result['message'] === "Successfully added translation tags") {
                 for (var tag of result['payload']) {
-                  this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'disabled': false });
+                  this.translationTags.push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'tagger_remark': tag['tagger_remark'], 'disabled': false });
                 }
                 console.log(JSON.stringify(this.translationTags));
               }
@@ -239,7 +242,7 @@ export class MenuComponent implements OnInit {
                 // Once result comes, add tags to purport section tags
                 if (result['status_code'] === 201 && result['message'] === "Successfully added purport tags") {
                   for (var tag of result['payload']) {
-                    this.purportSections[parseInt(index)]['tags'].push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'disabled': false });
+                    this.purportSections[parseInt(index)]['tags'].push({ 'tag': tag['tag'], 'subCategory': '', 'category': '', 'tag_id': tag['tag_id'], 'tagger': tag['tagger'], 'reviewer': tag['reviewer'], 'tagger_remark': tag['tagger_remark'], 'disabled': false });
                   }
                   console.log('ADDED TAGS to PURPORT SECTION ' + JSON.stringify(this.purportSections[parseInt(index)]['tags']));
                 }
@@ -291,7 +294,7 @@ export class MenuComponent implements OnInit {
           console.log('')
           return;
         }
-        if (sessionStorage.getItem('authUsername') !== this.purportSections[parseInt(index)]['tags']['tagger']) {
+        if (sessionStorage.getItem('authUsername') !== this.purportSections[parseInt(index)]['tags'][index2]['tagger']) {
           window.alert('Cannot remove tag added by other!');
           return;
         }
@@ -400,6 +403,7 @@ export class MenuComponent implements OnInit {
       'end_idx': this.verseForm.controls['purportText'].value.indexOf(inputText) + inputText.length - 1,
       'tags': []
     }
+
     console.log("NEW SECTION SELECTED ", newSection);
     // are indexes valid?
     if (newSection['start_idx'] >= 0 && newSection['end_idx'] <= this.verseForm.controls['purportText'].value.length - 1) {
@@ -417,48 +421,91 @@ export class MenuComponent implements OnInit {
       }
     }
     this.newPurportSection = "";
+
     //console.log("Selected Substring starts at index:", this.staticText.search(this.selectedText)," and ends at index:", this.staticText.search(this.selectedText)+this.selectedText.length-1)
-  }
-
-  checkNoExactOverlap(index) {
-    console.log("OVERLAP: CHECKING INDEX ", index);
-    if (index === 0 && this.purportSections.length === 1) {
-      console.log("OVERLAP: FIRST ELEMENT IN THE ARRAY!")
-      return true;
-    }
-    if (index !== this.purportSections.length - 1) {
-      if (this.purportSections[index]['start_idx'] === this.purportSections[index + 1]['start_idx']) {
-        if (this.purportSections[index]['end_idx'] === this.purportSections[index + 1]['end_idx']) {
-          return false;
-        } else {
-          console.log("OVERLAP: +1 END INDEX DON'T MATCH!")
-        }
-      } else {
-        console.log("OVERLAP: +1 START INDEX DON'T MATCH!")
-      }
-    }
-    if (index !== 0) {
-      if (this.purportSections[index]['start_idx'] === this.purportSections[index - 1]['start_idx']) {
-        if (this.purportSections[index]['end_idx'] === this.purportSections[index - 1]['end_idx']) {
-          return false;
-        } else {
-          console.log("OVERLAP: -1 END INDEX DON'T MATCH!")
-          return true;
-        }
-      } else {
-        console.log("OVERLAP: -1 START INDEX DON'T MATCH!")
-        return true;
-      }
-    }
-    return true;
 
   }
 
-  checkIfDuplicate(tagValue, existingTagArray) {
-    for (var tag of existingTagArray) {
-      if (tag['tag'] === tagValue) return true;
+
+
+  // ADD REMARK FOR A TAG, VISIBLE ON HOVER
+  // Permissions: Tagger can add remarks for his tags
+  addTagRemark(identifier, index, index2) {
+    if (identifier === "translation") {
+      if (sessionStorage.getItem('authUsername') === this.translationTags[index2]['tagger'] && this.translationTags[index2]['reviewer'] === null) {
+        console.log("ADD TAG REMARK called for ", identifier, " ", index, " ", index2);
+        const dialogRef = this.dialog.open(TagRemarkComponent, {
+          data: { remark: this.translationTags[index2]['tagger_remark'] }
+        });
+
+        dialogRef.afterClosed().subscribe(updatedRemark => {
+          if (updatedRemark !== this.translationTags[index2]['tagger_remark']) {
+            console.log("ADDING TAG REMARK ", updatedRemark);
+            var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+            var translationTagsData = {
+              "verse_id": verse_id,
+              "translationtags": [
+                {
+                  "tagger_remark": updatedRemark,
+                  "tag": this.translationTags[index2]['tag']
+                }
+              ]
+            }
+            this.db.addRemarkTranslationTag(translationTagsData).subscribe(result => {
+              console.log(result);
+              // Once result comes, update tagger_remark of translation tag
+              if (result['status_code'] === 201 && result['message'] === "Successfully added translation tags") {
+                this.translationTags[index2]['tagger_remark'] = result['payload'][0]['tagger_remark']
+              }
+            }, (error) => {
+              console.log(error);
+            })
+          }
+
+        });
+      } else {
+        window.alert('Cannot add remark to tag given by someone else or already reviewed!');
+      }
+    } else if (identifier === "purportSection") {
+      if (sessionStorage.getItem('authUsername') === this.purportSections[index]['tags'][index2]['tagger'] && this.purportSections[index]['tags'][index2]['reviewer'] === null) {
+        console.log("ADD TAG REMARK called for ", identifier, " ", index, " ", index2);
+        const dialogRef = this.dialog.open(TagRemarkComponent, {
+          data: { remark: this.purportSections[index]['tags'][index2]['tagger_remark'] }
+        });
+
+        dialogRef.afterClosed().subscribe(updatedRemark => {
+          if (updatedRemark !== this.purportSections[index]['tags'][index2]['tagger_remark']) {
+            console.log("ADDING TAG REMARK ", updatedRemark);
+            var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+            var purportsectionTagsData = {
+              "verse_id": verse_id,
+              "purporttags": [
+                {
+                  "tagger_remark": updatedRemark,
+                  "tag": this.purportSections[index]['tags'][index2]['tag'],
+                  "start_idx": this.purportSections[index]['start_idx'],
+                  "end_idx": this.purportSections[index]['end_idx']
+                }
+              ]
+            }
+            console.log(purportsectionTagsData);
+            this.db.addRemarkPurportSectionTag(purportsectionTagsData).subscribe(result => {
+              console.log(result);
+              // Once result comes, update tagger_remark of the purport section tag
+              if (result['status_code'] === 201 && result['message'] === "Successfully added purport tags") {
+                this.purportSections[index]['tags'][index2]['tagger_remark'] = result['payload'][0]['tagger_remark']
+              }
+            }, (error) => {
+              console.log(error);
+            })
+          }
+
+        });
+      } else {
+        window.alert('Cannot add remark to tag given by someone else  or already reviewed!');
+      }
     }
-    return false;
+
   }
 
   getPurportSectionText(index) {
@@ -531,44 +578,93 @@ export class MenuComponent implements OnInit {
 
   }
 
-  onSubmitChanges() {
-    var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
-    var translationtags = [];
-    for (var tag of this.translationTags) {
-      translationtags.push({ 'tag': tag['tag'] });
-    }
-    var translationTagsData = {
-      "verse_id": verse_id,
-      "translationtags": translationtags
-    }
-    console.log('SUBMITTING TRANSLATION TAGS ', translationTagsData);
-
-    this.db.postTranslationTags(translationTagsData).subscribe(r => {
-      console.log(r);
-    }, (error) => {
-      console.log(error);
-    })
-
-
-    var purportsectiontags = [];
-    for (var ps of this.purportSections) {
-      for (var tag of ps['tags']) {
-        purportsectiontags.push({ 'start_idx': ps['start_idx'], 'end_idx': ps['end_idx'], 'tag': tag['tag'] });
-      }
-    }
-    var purportsectionTagsData = {
-      "verse_id": verse_id,
-      "purporttags": purportsectiontags
-    }
-    console.log('SUBMITTING PURPORT SECTION TAGS ', purportsectionTagsData);
-    this.db.postPurportSectionTags(purportsectionTagsData).subscribe(r => {
-      console.log(r);
-    }, (error) => {
-      console.log(error);
-    })
-
-  }
-  proceedReviewPage (){
+  proceedReviewPage() {
     this.route.navigate(['review-page']);
   }
+
+
+  ///////// INNER FUNCTION CALLS
+
+  // CHECKS IF NEW PURPORT SECTION DOES NOT EXACTLY OVERLAP WITH ANY EXISTING PS
+  checkNoExactOverlap(index) {
+    console.log("OVERLAP: CHECKING INDEX ", index);
+    if (index === 0 && this.purportSections.length === 1) {
+      console.log("OVERLAP: FIRST ELEMENT IN THE ARRAY!")
+      return true;
+    }
+    if (index !== this.purportSections.length - 1) {
+      if (this.purportSections[index]['start_idx'] === this.purportSections[index + 1]['start_idx']) {
+        if (this.purportSections[index]['end_idx'] === this.purportSections[index + 1]['end_idx']) {
+          return false;
+        } else {
+          console.log("OVERLAP: +1 END INDEX DON'T MATCH!")
+        }
+      } else {
+        console.log("OVERLAP: +1 START INDEX DON'T MATCH!")
+      }
+    }
+    if (index !== 0) {
+      if (this.purportSections[index]['start_idx'] === this.purportSections[index - 1]['start_idx']) {
+        if (this.purportSections[index]['end_idx'] === this.purportSections[index - 1]['end_idx']) {
+          return false;
+        } else {
+          console.log("OVERLAP: -1 END INDEX DON'T MATCH!")
+          return true;
+        }
+      } else {
+        console.log("OVERLAP: -1 START INDEX DON'T MATCH!")
+        return true;
+      }
+    }
+    return true;
+  }
+
+  // CHECKS IF DUPLICATE TAG WHEN ADDING NEW TAGS 
+  checkIfDuplicate(tagValue, existingTagArray) {
+    for (var tag of existingTagArray) {
+      if (tag['tag'] === tagValue) return true;
+    }
+    return false;
+  }
+
+  //////// REDUNDANT FUNCTION CALLS
+
+  // onSubmitChanges() {
+  //   var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+  //   var translationtags = [];
+  //   for (var tag of this.translationTags) {
+  //     translationtags.push({ 'tag': tag['tag'] });
+  //   }
+  //   var translationTagsData = {
+  //     "verse_id": verse_id,
+  //     "translationtags": translationtags
+  //   }
+  //   console.log('SUBMITTING TRANSLATION TAGS ', translationTagsData);
+
+  //   this.db.postTranslationTags(translationTagsData).subscribe(r => {
+  //     console.log(r);
+  //   }, (error) => {
+  //     console.log(error);
+  //   })
+
+
+  //   var purportsectiontags = [];
+  //   for (var ps of this.purportSections) {
+  //     for (var tag of ps['tags']) {
+  //       purportsectiontags.push({ 'start_idx': ps['start_idx'], 'end_idx': ps['end_idx'], 'tag': tag['tag'] });
+  //     }
+  //   }
+  //   var purportsectionTagsData = {
+  //     "verse_id": verse_id,
+  //     "purporttags": purportsectiontags
+  //   }
+  //   console.log('SUBMITTING PURPORT SECTION TAGS ', purportsectionTagsData);
+  //   this.db.postPurportSectionTags(purportsectionTagsData).subscribe(r => {
+  //     console.log(r);
+  //   }, (error) => {
+  //     console.log(error);
+  //   })
+
+  // }
 }
+

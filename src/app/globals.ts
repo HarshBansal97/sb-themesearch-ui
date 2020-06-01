@@ -7,6 +7,7 @@ export interface Tag {
   tag_id: number;
   tagger: string;
   reviewer: string;
+  tagger_remark: string;
   disabled: boolean;
 }
 

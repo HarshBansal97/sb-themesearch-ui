@@ -10,6 +10,7 @@ import { LogoutComponent } from './logout/logout.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptorService } from './token-interceptor.service';
 import { AddTagComponent } from './add-tag/add-tag.component';
+import { TagRemarkComponent } from './tag-remark/tag-remark.component';
 import {NgModule} from '@angular/core';
 import { DemoMaterialModule } from '../material-module';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -32,6 +33,7 @@ import { MatInputModule } from '@angular/material/input';
     LoginComponent,
     LogoutComponent,
     AddTagComponent,
+    TagRemarkComponent,
     LoaderComponent,
     TextSelectDirective
   ],
@@ -49,7 +51,8 @@ import { MatInputModule } from '@angular/material/input';
     MatInputModule,
   ],
   entryComponents: [
-    AddTagComponent
+    AddTagComponent,
+    TagRemarkComponent
   ],
 
   providers: [

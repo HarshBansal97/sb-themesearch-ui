@@ -55,6 +55,18 @@ export class DbService {
     return this.http.post(APIConstants.PURPORTSECTIONTAGS, data, { headers: headers });
   }
 
+  public addRemarkTranslationTag(data) {
+    const headers = new HttpHeaders();
+    headers.set("content-type", "application/json; charset=utf-8");
+    return this.http.post(APIConstants.TRANSLATIONTAGS, data, { headers: headers });
+  }
+
+  public addRemarkPurportSectionTag(data) {
+    const headers = new HttpHeaders();
+    headers.set("content-type", "application/json; charset=utf-8");
+    return this.http.post(APIConstants.PURPORTSECTIONTAGS, data, { headers: headers });
+  }
+
   public deleteTranslationTag(tag_id) {
     return this.http.delete(APIConstants.TRANSLATIONTAGS+'/'+tag_id+'/');
   }
