@@ -35,6 +35,7 @@ export class MenuComponent implements OnInit {
   firstFormGroup;
   secondFormGroup;
   errortext: string = '';
+  verseId: string = '---';
   verseSelectionForm: FormGroup;
   verseForm: FormGroup;
   // cantos = new Array(12);
@@ -100,6 +101,7 @@ export class MenuComponent implements OnInit {
     this.translationTagsSelect.setValue('');
     this.errortext = '';
     this.verseForm.reset();
+    this.verseId = "---";
     console.log(this.verseSelectionForm.value);
     this.db.getVerse(this.verseSelectionForm.value).subscribe(r => {
       console.log(r);
@@ -114,26 +116,35 @@ export class MenuComponent implements OnInit {
           document.getElementById("tData").innerText = verseInfo['translation'];
           document.getElementById("pData").innerText = verseInfo['purport'];
           this.fetchedVerse = true;
-
+          this.verseId = verseInfo['verse_id'];
           // GET TAGS
           this.getTranslationTags();
           this.getPurportSectionTags();
         } else {
           this.errortext = JSON.stringify('ERROR: unable to fetch the verse');
+          document.getElementById("vData").innerText = "";
+          document.getElementById("tData").innerText = "";
+          document.getElementById("pData").innerText = "";
         }
       } else {
         this.errortext = JSON.stringify('ERROR: unable to fetch the verse');
+        document.getElementById("vData").innerText = "";
+        document.getElementById("tData").innerText = "";
+        document.getElementById("pData").innerText = "";
       }
     }, (error) => {
       console.log(error);
-      this.errortext = JSON.stringify(error);
+      this.errortext = JSON.stringify('ERROR: unable to fetch the verse');
+      document.getElementById("vData").innerText = "";
+      document.getElementById("tData").innerText = "";
+      document.getElementById("pData").innerText = "";
     })
   }
 
   getTranslationTags() {
     this.translationTags = [];
     console.log("GET TRANSLATION TAGS CALLED")
-    this.db.getTranslationTags(this.verseSelectionForm.value).subscribe(r => {
+    this.db.getTranslationTags(this.verseId).subscribe(r => {
       console.log(r);
       if (r.status_code === 200 && r.message === "Successfully fetched translation tags") {
         for (var tag of r.payload) {
@@ -149,7 +160,7 @@ export class MenuComponent implements OnInit {
 
   getPurportSectionTags() {
     console.log("GET PURPORT SECTION TAGS CALLED")
-    this.db.getPurportSectionTags(this.verseSelectionForm.value).subscribe(r => {
+    this.db.getPurportSectionTags(this.verseId).subscribe(r => {
       console.log(r);
       if (r.status_code === 200 && r.message === "Successfully fetched purport tags") {
         for (var pst of r.payload) {
@@ -186,7 +197,7 @@ export class MenuComponent implements OnInit {
       if (rTable) { // result not undefined
         if (identifier === 'translation') {
           // Make API call to add tags for translation
-          var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+          var verse_id = this.verseId;
           var translationtags = [];
           for (var tag of rTable) {
             // Remove duplicates wrt existing tags for the translation
@@ -220,7 +231,7 @@ export class MenuComponent implements OnInit {
           if (parseInt(index) !== -1) {
 
             // Make API call to add tags for purport
-            var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+            var verse_id = this.verseId;
             var purportsectiontags = [];
             var ps = this.purportSections[parseInt(index)];
             for (var tag of rTable) {
@@ -441,7 +452,7 @@ export class MenuComponent implements OnInit {
         dialogRef.afterClosed().subscribe(updatedRemark => {
           if (updatedRemark !== this.translationTags[index2]['tagger_remark']) {
             console.log("ADDING TAG REMARK ", updatedRemark);
-            var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+            var verse_id = this.verseId;
             var translationTagsData = {
               "verse_id": verse_id,
               "translationtags": [
@@ -476,7 +487,7 @@ export class MenuComponent implements OnInit {
         dialogRef.afterClosed().subscribe(updatedRemark => {
           if (updatedRemark !== this.purportSections[index]['tags'][index2]['tagger_remark']) {
             console.log("ADDING TAG REMARK ", updatedRemark);
-            var verse_id = this.verseSelectionForm.controls['canto'].value + '.' + this.verseSelectionForm.controls['chapter'].value + '.' + this.verseSelectionForm.controls['verse'].value;
+            var verse_id = this.verseId;
             var purportsectionTagsData = {
               "verse_id": verse_id,
               "purporttags": [

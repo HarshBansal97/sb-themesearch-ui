@@ -23,8 +23,7 @@ export class DbService {
     return this.http.get(APIConstants.VERSE, { headers: headers, params: params });
   }
 
-  public getTranslationTags(data): Observable<any> {
-    let verse_id = data['canto'] + '.' + data['chapter'] + '.' + data['verse'];
+  public getTranslationTags(verse_id): Observable<any> {
     console.log('GET Translation Tags:', verse_id);
     let params = new HttpParams();
     params = params.set('verse_id', verse_id);
@@ -33,8 +32,7 @@ export class DbService {
     return this.http.get(APIConstants.TRANSLATIONTAGS, { headers: headers, params: params });
   }
 
-  public getPurportSectionTags(data): Observable<any> {
-    let verse_id = data['canto'] + '.' + data['chapter'] + '.' + data['verse'];
+  public getPurportSectionTags(verse_id): Observable<any> {
     console.log('GET Purport Section Tags:', verse_id);
     let params = new HttpParams();
     params = params.set('verse_id', verse_id);
