@@ -93,7 +93,7 @@ export class MenuComponent implements OnInit {
     this.gb.parseTags(tagsData);
   }
 
-  onSubmitVerse() {
+  onSubmitVerse(dir = 0) {
     this.fetchedVerse = false;
     this.translationTags = [];
     this.purportSections = [];
@@ -102,8 +102,9 @@ export class MenuComponent implements OnInit {
     this.errortext = '';
     this.verseForm.reset();
     this.verseId = "---";
+
     console.log(this.verseSelectionForm.value);
-    this.db.getVerse(this.verseSelectionForm.value).subscribe(r => {
+    this.db.getVerse(this.verseSelectionForm.value, dir).subscribe(r => {
       console.log(r);
       if (r.status_code === 200 && r.message === "Successfully fetched verses") {
         console.log(r.payload.length)
@@ -125,12 +126,14 @@ export class MenuComponent implements OnInit {
           document.getElementById("vData").innerText = "";
           document.getElementById("tData").innerText = "";
           document.getElementById("pData").innerText = "";
+          alert('ERROR: unable to fetch the verse');
         }
       } else {
         this.errortext = JSON.stringify('ERROR: unable to fetch the verse');
         document.getElementById("vData").innerText = "";
         document.getElementById("tData").innerText = "";
         document.getElementById("pData").innerText = "";
+        alert('ERROR: unable to fetch the verse');
       }
     }, (error) => {
       console.log(error);
@@ -138,7 +141,15 @@ export class MenuComponent implements OnInit {
       document.getElementById("vData").innerText = "";
       document.getElementById("tData").innerText = "";
       document.getElementById("pData").innerText = "";
+      alert('ERROR: unable to fetch the verse\ninvalid verse number!');
     })
+  }
+
+  previousVerse (){
+    this.onSubmitVerse(-1);
+  }
+  nextVerse (){
+    this.onSubmitVerse(1);
   }
 
   getTranslationTags() {
@@ -325,11 +336,16 @@ export class MenuComponent implements OnInit {
 
   removeSection(index: number) {
     console.log('REMOVE PURPORT SECTION ', index, 'from ', this.purportSections);
-    this.purportSections.splice(index, 1);
-    this.purportSectionTagsSelect.pop();
-    for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
-      this.purportSectionTagsSelect[i] = [];
+    var j = 0;
+    var l = this.purportSections[index]['tags'].length;
+    while (j < l) {
+      this.removeTag('purportSection', index, j);
+      j++;
     }
+ 
+    // for (var j = 0; j < this.purportSectionTagsSelect.length; j++) {
+    //   this.purportSectionTagsSelect[j] = [];
+    // }
     console.log('REMOVED PURPORT SECTION ', this.purportSections);
   }
 
@@ -637,6 +653,15 @@ export class MenuComponent implements OnInit {
     }
     return false;
   }
+
+  reload(){
+    var container = document.getElementById("RefDiv");
+    var content = container.innerHTML;
+    container.innerHTML= content; 
+    
+   //this line is to watch the result in console , you can remove it later	
+    console.log("Refreshed"); 
+}
 
   //////// REDUNDANT FUNCTION CALLS
 

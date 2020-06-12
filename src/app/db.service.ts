@@ -10,7 +10,7 @@ export class DbService {
 
   constructor(private http: HttpClient) { }
 
-  public getVerse(data): Observable<any> {
+  public getVerse(data, dir): Observable<any> {
     let verse_id = data['canto'] + '.' + data['chapter'] + '.' + data['verse'];
     console.log('GET Verse:', verse_id);
 
@@ -19,8 +19,10 @@ export class DbService {
     
     const headers = new HttpHeaders();
     headers.set("content-type", "application/json; charset=utf-8");
-    
-    return this.http.get(APIConstants.VERSE, { headers: headers, params: params });
+    if (dir == 0) return this.http.get(APIConstants.VERSE, { headers: headers, params: params });
+    else if (dir == 1) return this.http.get(APIConstants.NVERSE, { headers: headers, params: params });
+    else if (dir == -1) return this.http.get(APIConstants.PVERSE, { headers: headers, params: params });
+    return ;
   }
 
   public getTranslationTags(verse_id): Observable<any> {

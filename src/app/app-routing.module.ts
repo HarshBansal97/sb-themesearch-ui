@@ -10,8 +10,8 @@ import { RouteGuardService } from './route-guard.service';
 const routes: Routes = [
  {path: "", component: LoginComponent},
  //{path: "menu/:uname", component: MenuComponent,canActivate:[RouteGuardService]},
- {path: "home", component: MenuComponent,canActivate:[RouteGuardService]},
- {path: "logout", component: LogoutComponent,canActivate:[RouteGuardService]},
+ {path: "home", component: MenuComponent, canActivate:[RouteGuardService]},
+ {path: "logout", component: LogoutComponent, canActivate:[RouteGuardService]},
  {path: "error", component:ErrorComponent},
  {path: "**", component:ErrorComponent}
 ];
