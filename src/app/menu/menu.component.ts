@@ -106,7 +106,7 @@ export class MenuComponent implements OnInit {
     console.log(this.verseSelectionForm.value);
     this.db.getVerse(this.verseSelectionForm.value, dir).subscribe(r => {
       console.log(r);
-      if (r.status_code === 200 && r.message === "Successfully fetched verses") {
+      if (r.status_code === 200 && (r.message === "Successfully fetched verses" || r.message === "Successfully fetched next verse" || r.message === "Successfully fetched previous verse")) {
         console.log(r.payload.length)
         if (r.payload.length !== 0) {
           let verseInfo = r.payload[0];
@@ -118,6 +118,10 @@ export class MenuComponent implements OnInit {
           document.getElementById("pData").innerText = verseInfo['purport'];
           this.fetchedVerse = true;
           this.verseId = verseInfo['verse_id'];
+          var res = this.verseId.split(".")
+          this.verseSelectionForm.controls['canto'].setValue(res[0]);
+          this.verseSelectionForm.controls['chapter'].setValue(res[1]);
+          this.verseSelectionForm.controls['verse'].setValue(res[2]);
           // GET TAGS
           this.getTranslationTags();
           this.getPurportSectionTags();
