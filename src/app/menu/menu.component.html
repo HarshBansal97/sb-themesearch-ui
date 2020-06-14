@@ -76,7 +76,7 @@
             </mat-form-field>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-1 col-lg-1">
-            <button type="submit" class="btn-primary btn mt-2 full-width" (click)="addTag('translation',-1)">
+            <button type="submit" class="btn-primary btn mt-2 full-width" (click)="addTags('translation',-1)">
               Add
             </button>
           </div>
@@ -113,7 +113,7 @@
                   </mat-form-field>
                 </div>
                 <div class="col-xs-3">
-                  <button class="btn-primary btn mt-2 full-width" (click)="addTag('purportSection', i)">
+                  <button class="btn-primary btn mt-2 full-width" (click)="addTags('purportSection', i)">
                     Add
                   </button>
                 </div>
@@ -158,7 +158,46 @@
                   ŚB {{verseId}}
                 </mat-panel-title>
               </mat-expansion-panel-header>
+              <br>
+              <div class="form-group">
+                <form [formGroup]="verseForm">
+                  <div class="row">
+                    <div class="col-md-3">
+                      
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field appearance="outline" class="col-md-12">
+                        <mat-label>Title</mat-label>
+                        <textarea rows="1" matInput formControlName='verseTitle'></textarea>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3">
+                      
+                    </div>
+                    
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                    
+                    </div>
+                    <div class="col-md-6">
+                      <mat-form-field appearance="outline" class="col-md-12">
+                        <mat-label>Context</mat-label>
+                        <textarea rows="1" matInput formControlName='verseContext'></textarea>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-md-3">
+                      <div *ngIf="isReviewer">
+                        <button class="btn-primary btn mt-2" (click)="updateContextTitle()">
+                          Update
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>                  
               <p style="text-align: center; font-size: large; padding: 10px 40px;"><span id="vData"></span></p>
+
             </mat-expansion-panel>
 
             <mat-expansion-panel>
@@ -192,7 +231,7 @@
 
                   </div>
                   <div class="col-sm-2">
-                    <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+                    <button mat-button (click)="addTags('translation',-1)">Add tag</button>
                   </div>
                 </div>
                 <!-- <div *ngFor="let Ttags of translationTags; let j=index;">
@@ -205,7 +244,7 @@
                     <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
                       (click)="removeTag('translation', -1, j)">&times;</button>
                   </div>
-                  <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+                  <button mat-button (click)="addTags('translation',-1)">Add tag</button>
                 </div> -->
               </mat-action-row>
             </mat-expansion-panel>
@@ -279,7 +318,7 @@
 
                     </div>
                     <div class="col-sm-2">
-                      <button mat-stroked-button (click)="addTag('purportSection',i)">Add tag</button>
+                      <button mat-stroked-button (click)="addTags('purportSection',i)">Add tag</button>
                       <button mat-stroked-button color="warn" (click)="removeSection(i)">Delete section</button>
                     </div>
                   </div>
@@ -309,7 +348,7 @@
                     </mat-form-field>
                   </div>
                   <div class="col-xs-3">
-                    <button class="btn-primary btn mt-2 full-width" (click)="addTag('purportSection', i)">
+                    <button class="btn-primary btn mt-2 full-width" (click)="addTags('purportSection', i)">
                       Add
                     </button>
                   </div>
@@ -385,7 +424,7 @@
                     <button mat-button style="margin: 0px 0px 0px 0px; padding: 0px 0px; min-width: 20px;"
                       (click)="removeTag('translation', -1, j)">&times;</button>
                   </div>
-                  <button mat-button (click)="addTag('translation',-1)">Add tag</button>
+                  <button mat-button (click)="addTags('translation',-1)">Add tag</button>
                   </div> -->
                   <!-- <p style="text-align: justify; font-size: large; padding: 0px 40px;">
                                   {{this.verseForm.controls['translationText'].value}}</p>

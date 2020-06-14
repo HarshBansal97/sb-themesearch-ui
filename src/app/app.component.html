@@ -10,7 +10,11 @@
     <ul class="nav navbar-nav"  *ngIf='authServiceService.isUserLogin()'>
         <li class="active"><a class="btn" routerLink='/logout' style="color: mintcream;">Logout</a></li>
     </ul>
-     
+    <div style="float: right;color: white; text-align: center; height: 100%" *ngIf='authServiceService.isUserLogin()'>
+      <div style="display: inline-block;">
+        Welcome, {{gb.username}}
+      </div>
+    </div>
   </div>
 </nav>
 <router-outlet></router-outlet>

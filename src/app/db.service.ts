@@ -43,6 +43,12 @@ export class DbService {
     return this.http.get(APIConstants.PURPORTSECTIONTAGS, { headers: headers, params: params });
   }
 
+  public postContextTitle(data) {
+    const headers = new HttpHeaders();
+    headers.set("content-type", "application/json; charset=utf-8");
+    return this.http.post(APIConstants.CONTEXT_TITLE, data, { headers: headers });
+  }
+
   public postTranslationTags(data) {
     const headers = new HttpHeaders();
     headers.set("content-type", "application/json; charset=utf-8");

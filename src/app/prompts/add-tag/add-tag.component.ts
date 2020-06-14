@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableDataSource } from '@angular/material/table';
-import { DbService } from '../db.service';
-import { Globals } from '../globals';
+import { DbService } from '../../db.service';
+import { Globals } from '../../globals';
 
 export interface TagInTable {
   tag: string;

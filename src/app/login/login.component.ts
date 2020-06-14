@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthServiceService } from '../auth-service.service';
+import { Globals } from '../globals';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ export class LoginComponent implements OnInit {
   password: string;
   errorMessage: string="";
   validate: boolean;
-  constructor(private route: Router,private authServiceService:AuthServiceService) { }
+  constructor(private route: Router,private authServiceService:AuthServiceService, public gb: Globals,) { }
 
   ngOnInit() {
   }
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
         sessionStorage.setItem('token',res.token);
         sessionStorage.setItem('account_type',res.account_type);
         sessionStorage.setItem('user_id',res.user_id);
+        this.gb.username = this.username
         this.route.navigate(['home']);
       } else {
         console.log('NOT SUCCESSFUL, ', res);

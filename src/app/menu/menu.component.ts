@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { AddTagComponent } from '../add-tag/add-tag.component';
-import { TagRemarkComponent } from '../tag-remark/tag-remark.component';
+import { AddTagComponent } from '../prompts/add-tag/add-tag.component';
+import { TagRemarkComponent } from '../prompts/tag-remark/tag-remark.component';
 import { FormBuilder, FormGroup, Validators, FormControl, FormArray } from '@angular/forms';
 import { DbService } from '../db.service';
 import { Globals, Tag } from '../globals';
@@ -42,12 +42,14 @@ export class MenuComponent implements OnInit {
   // chapters = new Array(90);
   // verses = new Array(100);
   translationTagsSelect = new FormControl();
-  purportSectionTagsSelect = [];
+  //purportSectionTagsSelect = [];
   translationTags: Tag[] = [];
   purportSections: PurportSection[] = [];
   fetchedVerse = false;
-  newPurportSection: string;
+  newPurportSection: string = "";
   isReviewer: boolean = false;
+  verseTitle: string = "";
+  verseContext: string = "";
 
   constructor(
     private route: Router,
@@ -69,14 +71,19 @@ export class MenuComponent implements OnInit {
     });
 
     this.verseForm = this.fb.group({
+      verseTitle: [''],
+      verseContext: [''],
       verseText: [''],
       translationText: [''],
       purportText: ['']
     });
+
     if (parseInt(sessionStorage.getItem('account_type')) === 3) {
       this.isReviewer = true;
     } else {
       this.isReviewer = false;
+      this.verseForm.controls['verseTitle'].disable();
+      this.verseForm.controls['verseContext'].disable();
     }
     this.hostRectangle = null;
     this.selectedText = "";
@@ -97,7 +104,7 @@ export class MenuComponent implements OnInit {
     this.fetchedVerse = false;
     this.translationTags = [];
     this.purportSections = [];
-    this.purportSectionTagsSelect = [];
+    //this.purportSectionTagsSelect = [];
     this.translationTagsSelect.setValue('');
     this.errortext = '';
     this.verseForm.reset();
@@ -113,9 +120,12 @@ export class MenuComponent implements OnInit {
           this.verseForm.controls['verseText'].setValue(verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms']);
           this.verseForm.controls['translationText'].setValue(verseInfo['translation']);
           this.verseForm.controls['purportText'].setValue(verseInfo['purport']);
+          this.verseForm.controls['verseTitle'].setValue(verseInfo['title']);
+          this.verseForm.controls['verseContext'].setValue(verseInfo['context']);
           document.getElementById("vData").innerText = verseInfo['devanagari'] + '\n\n' + verseInfo['verse'] + '\n\n' + verseInfo['synonyms'];
           document.getElementById("tData").innerText = verseInfo['translation'];
           document.getElementById("pData").innerText = verseInfo['purport'];
+          
           this.fetchedVerse = true;
           this.verseId = verseInfo['verse_id'];
           var res = this.verseId.split(".")
@@ -199,9 +209,28 @@ export class MenuComponent implements OnInit {
     })
   }
 
-  // Any user can add tags for translation, purport section
+  // Reviewer can update context and title for a verse
+  updateContextTitle() {
+    var data = {
+      "verse_id": this.verseId,
+      "context": this.verseForm.controls['verseContext'].value,
+      "title": this.verseForm.controls['verseTitle'].value
+    }
 
-  addTag(identifier, index): void {
+    this.db.postContextTitle(data).subscribe(result => {
+      console.log(result);
+      // Once result comes, add tags to translation tags
+      if (result['status_code'] === 201 && result['message'] === "Successfully added verse context and title") {
+        // window.alert('Successfully added/updated verse context and title');
+      }
+    }, (error) => {
+      console.log(error);
+    })
+  }
+
+
+  // Any user can add tags for translation, purport section
+  addTags(identifier, index): void {
 
     const dialogRef = this.dialog.open(AddTagComponent, {
 
@@ -292,11 +321,13 @@ export class MenuComponent implements OnInit {
       // Check permissions
       if (parseInt(sessionStorage.getItem('account_type')) === 2) {
         if (this.translationTags[index2]['reviewer'] !== null) {
-          window.alert('Cannot remove tag already reviewed!');
+          let message = 'Cannot remove tag - ' + this.translationTags[index2]['tag'] + ' already reviewed!';
+          window.alert(message);
           return;
         }
         if (sessionStorage.getItem('authUsername') !== this.translationTags[index2]['tagger']) {
-          window.alert('Cannot remove tag added by other!');
+          let message = 'Cannot remove tag - ' + this.translationTags[index2]['tag'] + ' added by other!';
+          window.alert(message);
           return;
         }
       }
@@ -316,15 +347,18 @@ export class MenuComponent implements OnInit {
       // Check permissions
       if (parseInt(sessionStorage.getItem('account_type')) === 2) {
         if (this.purportSections[parseInt(index)]['tags'][index2]['reviewer'] !== null) {
-          window.alert('Cannot remove tag already reviewed!');
+          let message = 'Cannot remove tag - ' + this.purportSections[parseInt(index)]['tags'][index2]['tag'] + ' already reviewed!';
+          window.alert(message);
           console.log('')
           return;
         }
         if (sessionStorage.getItem('authUsername') !== this.purportSections[parseInt(index)]['tags'][index2]['tagger']) {
-          window.alert('Cannot remove tag added by other!');
+          let message = 'Cannot remove tag - ' + this.purportSections[parseInt(index)]['tags'][index2]['tag'] + ' added by other!';
+          window.alert(message);
           return;
         }
       }
+
       // Make API call
       this.db.deletePurportSectionTag(this.purportSections[parseInt(index)]['tags'][index2]['tag_id']).subscribe(result => {
         console.log(result);
@@ -338,19 +372,82 @@ export class MenuComponent implements OnInit {
     }
   }
 
-  removeSection(index: number) {
-    console.log('REMOVE PURPORT SECTION ', index, 'from ', this.purportSections);
-    var j = 0;
-    var l = this.purportSections[index]['tags'].length;
-    while (j < l) {
-      this.removeTag('purportSection', index, j);
-      j++;
+  // Synchronous removal of tags. If all tags for a purport section are removed, the purport section is removed.
+  // indexArray: array of indexes which need to be removed
+  // tagsRemoved: counter to store number of tags successfully removed. Starts with default 0 if argument not provided.
+  removeTags(identifier, index, indexArray, tagsRemoved = []): void {
+    console.log('Remove tags called, ', identifier, index, indexArray, tagsRemoved);
+    if (identifier === 'purportSection') {
+      if (indexArray.length === 0) { // Base case
+        if (this.purportSections[index]['tags'].length === tagsRemoved.length) { // all tags have been removed!
+          // remove the purport section
+          console.group("DELETING PURPORT SECTION");
+          console.log("Section to be removed:", this.purportSections[index]);
+          console.log("Old purport sections:", this.purportSections);
+          this.purportSections.splice(index, 1);
+          console.log("New purport sections:", this.purportSections);
+          console.groupEnd();
+          return;
+        } else {
+          // cannot remove the purport section. But delete the tags which have been removed by api call.
+          console.group("DELETING PURPORT SECTION");
+          console.log("Section cannot be removed, remaining tags ", this.purportSections[index]['tags'].length - tagsRemoved.length);
+          console.groupEnd();
+          tagsRemoved.sort(function(a, b){return b-a}); // descending order
+          for (var i = 0; i < tagsRemoved.length; i++) 
+            this.purportSections[parseInt(index)]['tags'].splice(tagsRemoved[i], 1); 
+          return;
+        }
+      }
+
+      var index2 = indexArray.pop();
+
+      // Check permissions
+      if (parseInt(sessionStorage.getItem('account_type')) === 2) {
+        if (this.purportSections[parseInt(index)]['tags'][index2]['reviewer'] !== null) {
+          let message = 'Cannot remove tag - ' + this.purportSections[parseInt(index)]['tags'][index2]['tag'] + ' already reviewed!';
+          window.alert(message);
+          console.log('')
+          return;
+        }
+        if (sessionStorage.getItem('authUsername') !== this.purportSections[parseInt(index)]['tags'][index2]['tagger']) {
+          let message = 'Cannot remove tag - ' + this.purportSections[parseInt(index)]['tags'][index2]['tag'] + ' added by other!';
+          window.alert(message);
+          return;
+        }
+      }
+
+      // Make API call
+      this.db.deletePurportSectionTag(this.purportSections[parseInt(index)]['tags'][index2]['tag_id']).subscribe(result => {
+        console.log(result);
+        // Once result comes, update tagsRemoved. Make a recursive call
+        if (result['status_code'] === 204 && result['message'] === "Successfully deleted purport tag") {
+          tagsRemoved.push(index2);
+          this.removeTags(identifier, index, indexArray, tagsRemoved);
+        }
+      }, (error) => {
+        // Still make recursive call, try to remove remaining tags.
+        console.log(error);
+        this.removeTags(identifier, index, indexArray, tagsRemoved);
+      })
     }
- 
-    // for (var j = 0; j < this.purportSectionTagsSelect.length; j++) {
-    //   this.purportSectionTagsSelect[j] = [];
-    // }
-    console.log('REMOVED PURPORT SECTION ', this.purportSections);
+  }
+
+  removeSection(index: number) {
+    if (confirm("Do you wish to remove the purport section!")) {
+      console.log('REMOVE PURPORT SECTION ', index, 'from ', this.purportSections);
+      var indexArray = []
+      var j = 0;
+      var l = this.purportSections[index]['tags'].length;
+      while (j < l) {
+        indexArray.push(j);
+        j++;
+      }
+      this.removeTags('purportSection', index, indexArray);
+    } else {
+      console.log("You pressed cancel");
+    }
+    
   }
 
   renderRectangles(event: TextSelectEvent): void {
@@ -392,23 +489,23 @@ export class MenuComponent implements OnInit {
     // are indexes valid?
     if (newSection['start_idx'] >= 0 && newSection['end_idx'] <= this.verseForm.controls['purportText'].value.length - 1) {
       console.log('NEW SECTION VALID ', newSection);
-      this.purportSectionTagsSelect.push([]);
-      for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
-        this.purportSectionTagsSelect[i] = [];
-      }
+      // this.purportSectionTagsSelect.push([]);
+      // for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
+      //   this.purportSectionTagsSelect[i] = [];
+      // }
       this.purportSections.push(newSection);
       this.purportSections.sort(function (a, b) { return a['start_idx'] === b['start_idx'] ? a['end_idx'] - b['end_idx'] : a['start_idx'] - b['start_idx'] });
       console.log('SORTED PURPORT SECTIONS ', this.purportSections);
       var indexNewSection = this.purportSections.lastIndexOf(newSection);
       if (this.checkNoExactOverlap(indexNewSection)) {
-        this.addTag('purportSection', indexNewSection);
+        this.addTags('purportSection', indexNewSection);
         console.log('ADDING NEW PURPORT SECTION!');
       } else {
         this.purportSections.splice(indexNewSection, 1);
-        this.purportSectionTagsSelect.pop();
-        for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
-          this.purportSectionTagsSelect[i] = [];
-        }
+        // this.purportSectionTagsSelect.pop();
+        // for (var i = 0; i < this.purportSectionTagsSelect.length; i++) {
+        //   this.purportSectionTagsSelect[i] = [];
+        // }
         console.log('DUPLICATE PURPORT SECTION FOUND! ', this.purportSections);
       }
     }
@@ -429,6 +526,8 @@ export class MenuComponent implements OnInit {
     console.log(inputText);
     console.groupEnd();
 
+    if (inputText.length === 0) return;
+
     var newSection = {
       'start_idx': this.verseForm.controls['purportText'].value.indexOf(inputText),
       'end_idx': this.verseForm.controls['purportText'].value.indexOf(inputText) + inputText.length - 1,
@@ -444,7 +543,7 @@ export class MenuComponent implements OnInit {
       console.log('SORTED PURPORT SECTIONS ', this.purportSections);
       var indexNewSection = this.purportSections.lastIndexOf(newSection);
       if (this.checkNoExactOverlap(indexNewSection)) {
-        this.addTag('purportSection', indexNewSection);
+        this.addTags('purportSection', indexNewSection);
         console.log('ADDING NEW PURPORT SECTION!');
       } else {
         this.purportSections.splice(indexNewSection, 1);
