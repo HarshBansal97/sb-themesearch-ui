@@ -30,6 +30,9 @@ export class Globals {
                 for (var tag of tags) {
                     var tagText = tag['text'];
                     returnTags.push({ 'tag': tagText, 'subCategory': subCategoryText, 'category': categoryText })
+                    if ('outline' in tag) { // level 4 tag
+                      console.log("LEVEL 4 tags discovered, ", tag['outline']);
+                    }
                 }
             }
         }
@@ -1300,18 +1303,13 @@ export class Globals {
                     "text": "Submissiveness"
                   },
                   {
-                    "outline": [
-                      {
-                        "text": "Gratitude For Krishna"
-                      },
-                      {
-                        "text": "Gratitude For Guru"
-                      },
-                      {
-                        "text": "Gratitude For devotees"
-                      }
-                    ],
-                    "text": "Gratitude"
+                    "text": "Gratitude For Krishna"
+                  },
+                  {
+                    "text": "Gratitude For Guru"
+                  },
+                  {
+                    "text": "Gratitude For devotees"
                   },
                   {
                     "text": "Detachment"
@@ -2159,15 +2157,10 @@ export class Globals {
               {
                 "outline": [
                   {
-                    "outline": [
-                      {
-                        "text": "blind leader"
-                      },
-                      {
-                        "text": "false incarnations"
-                      }
-                    ],
-                    "text": "modern civilization fallacy"
+                    "text": "blind leader"
+                  },
+                  {
+                    "text": "false incarnations"
                   },
                   {
                     "text": "modern civilization remedy"

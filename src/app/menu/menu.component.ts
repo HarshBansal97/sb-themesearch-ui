@@ -407,12 +407,15 @@ export class MenuComponent implements OnInit {
         if (this.purportSections[parseInt(index)]['tags'][index2]['reviewer'] !== null) {
           let message = 'Cannot remove tag - ' + this.purportSections[parseInt(index)]['tags'][index2]['tag'] + ' already reviewed!';
           window.alert(message);
-          console.log('')
+          this.removeTags(identifier, index, indexArray, tagsRemoved);
+          console.log('RETURNING FROM NON PERMISSIONED TAG');
           return;
         }
         if (sessionStorage.getItem('authUsername') !== this.purportSections[parseInt(index)]['tags'][index2]['tagger']) {
           let message = 'Cannot remove tag - ' + this.purportSections[parseInt(index)]['tags'][index2]['tag'] + ' added by other!';
           window.alert(message);
+          this.removeTags(identifier, index, indexArray, tagsRemoved);
+          console.log('RETURNING FROM NON PERMISSIONED TAG');
           return;
         }
       }
